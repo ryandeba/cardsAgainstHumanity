@@ -1,0 +1,48 @@
+{% load staticfiles %}
+<!doctype html>
+<html>
+	<head>
+		<title>Cards Against Humanity</title>
+
+		<link rel="stylesheet" type="text/css" href="{% static 'game/css/bootstrap.min.css' %}" />
+
+		<script src="{% static 'game/js/vendor/jQuery.js' %}"></script>
+		<script src="{% static 'game/js/vendor/underscore.js' %}"></script>
+		<script src="{% static 'game/js/vendor/backbone.js' %}"></script>
+		<script src="{% static 'game/js/vendor/backbone.marionette.js' %}"></script>
+
+		<script src="{% static 'game/js/cardsAgainstHumanity.js' %}"></script>
+
+		<script>
+			$(function(){
+				cardsAgainstHumanity.start();
+			});
+		</script>
+	</head>
+	<body>
+		<header class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="./" class="navbar-brand">Cards against humanity</a>
+				</div>
+
+				<nav>
+					<ul class="nav navbar-nav">
+						<li><a href="#lobby">Lobby</a></li>
+					</ul>
+
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#about">About</a></li>
+					</ul>
+				</nav>
+
+			</div>
+		</header>
+
+		<div id="main" class="container">
+		</div>
+
+		<script type="text/template" id="template-login">
+		</script>
+	</body>
+</html>
