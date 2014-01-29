@@ -43,4 +43,9 @@ $(function(){
 		cardsAgainstHumanity.main.show(loginView);
 	};
 
+	var showAbout = function(){
+		aboutView = new cardsAgainstHumanity.AboutView();
+		cardsAgainstHumanity.main.show(aboutView);
+	};
+
 });
