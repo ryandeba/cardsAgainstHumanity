@@ -8,15 +8,39 @@ $(function(){
 
 	cardsAgainstHumanity.on("initialize:after", function(options){
 		showLogin();
+
+		this.listenTo(this.vent, "login", function(data){
+			$.ajax({
+				url: "/login",
+				type: "POST",
+				data: data,
+				error: loginErrorResponse,
+				success: loginSuccessResponse
+			});
+		});
+
+		this.listenTo(this.vent, "register", function(data){
+			$.ajax({
+				url: "/register",
+				type: "POST",
+				data: data,
+				success: registerSuccessResponse
+			});
+		});
 	});
 
-	var showLogin = function(){
-		loginView = new LoginView();
-		cardsAgainstHumanity.main.show(loginView);
+	var loginErrorResponse = function(response){
 	};
 
-	var LoginView = Backbone.Marionette.ItemView.extend({
-		template: "#template-login"
-	});
+	var loginSuccessResponse = function(response){
+	};
+
+	var registerSuccessResponse = function(response){
+	};
+
+	var showLogin = function(){
+		loginView = new cardsAgainstHumanity.LoginView();
+		cardsAgainstHumanity.main.show(loginView);
+	};
 
 });

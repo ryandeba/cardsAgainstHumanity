@@ -11,7 +11,9 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^lobby/', views.lobby, name = "lobby"),
-    url(r'^game/(?P<game_id>\d+)', views.game, name = "lobby"),
+    url(r'^login', views.login, name = "login"),
+    url(r'^register', views.register, name = "register"),
+    url(r'^lobby', views.lobby, name = "lobby"),
+    url(r'^game/(?P<game_id>\d+)', views.game, name = "game"),
     url(r'^.*$', views.index, name = "index"),
 )
