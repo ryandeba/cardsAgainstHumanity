@@ -19,6 +19,7 @@
 		<script src="{% static 'game/js/cardsAgainstHumanity.js' %}"></script>
 		<script src="{% static 'game/js/LoginView.js' %}"></script>
 		<script src="{% static 'game/js/AboutView.js' %}"></script>
+		<script src="{% static 'game/js/LobbyView.js' %}"></script>
 
 		<script>
 			$(function(){
@@ -36,9 +37,6 @@
 				<nav>
 					<ul class="nav navbar-nav">
 						<li><a href="#lobby">Lobby</a></li>
-					</ul>
-
-					<ul class="nav navbar-nav navbar-right">
 						<li><a href="#about">About</a></li>
 					</ul>
 				</nav>
@@ -81,6 +79,40 @@
 								</div>
 
 							</form>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script type="text/template" id="template-lobby">
+			<div class="row">
+				<div class="col-xs-8 col-xs-offset-2">
+					<form class="form-horizontal js-login-form">
+						{% csrf_token %}
+						<input type="hidden" name="playerhash" value="{{ playerhash }}" />
+						<div class="input-group input-group-lg">
+							<span class="input-group-addon">Username</span>
+							<input type="text" class="form-control" name="username" placeholder="Username" required />
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">Lobby</div>
+						<div class="panel-body">
+							<ol class="list-group">
+								<li class="list-group-item">Players: 4 | Last player joined 10 minutes ago</li>
+								<li class="list-group-item">Players: 4 | Last player joined 10 minutes ago</li>
+								<li class="list-group-item">Players: 4 | Last player joined 10 minutes ago</li>
+								<li class="list-group-item">Players: 4 | Last player joined 10 minutes ago</li>
+							</ol>
+
+							<button class="btn btn-primary js-new-game">New Game</button>
 
 						</div>
 					</div>

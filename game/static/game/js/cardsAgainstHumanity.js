@@ -7,7 +7,7 @@ $(function(){
 	});
 
 	cardsAgainstHumanity.on("initialize:after", function(options){
-		showLogin();
+		showLobby();
 
 		this.listenTo(this.vent, "login", function(data){
 			$.ajax({
@@ -39,13 +39,18 @@ $(function(){
 	};
 
 	var showLogin = function(){
-		loginView = new cardsAgainstHumanity.LoginView();
+		var loginView = new cardsAgainstHumanity.LoginView();
 		cardsAgainstHumanity.main.show(loginView);
 	};
 
 	var showAbout = function(){
-		aboutView = new cardsAgainstHumanity.AboutView();
+		var aboutView = new cardsAgainstHumanity.AboutView();
 		cardsAgainstHumanity.main.show(aboutView);
+	};
+
+	var showLobby = function(){
+		var lobbyView = new cardsAgainstHumanity.LobbyView();
+		cardsAgainstHumanity.main.show(lobbyView);
 	};
 
 });

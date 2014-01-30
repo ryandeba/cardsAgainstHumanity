@@ -1,38 +1,32 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login
+from game.models import Player, Game
+
+import random
 
 def index(request):
-	return render(request, 'game/index.html')
+	playerhash = "%032x" % random.getrandbits(128)
+	return render(request, 'game/index.html', {'playerhash': playerhash})
 
-def login(request):
-	username = request.POST.get("username", "")
-	password = request.POST.get("password", "")
-	user = authenticate(username = username, password = password)
-	if user is not None:
-		auth_login(request, user)
-		return HttpResponse(status = 200)
+def setPlayerName(request):
+	playerhash = request.POST.get("playerhash", "")
+	name = request.POST.get("name", "")
+
+	players = Player.models.filter(hash = playerhash)
+	if len(players) == 0:
+		player = Player(hash = playerhash)
 	else:
-		return HttpResponse(status = 401)
-
-def register(request):
-	username = request.POST.get("username", "")
-
-	existingUsersWithUsername = User.objects.filter(username = username)
-	if len(existingUsersWithUsername) > 0:
-		return HttpResponse(status = 409)
-
-	password = request.POST.get("password", "")
-	user = User.objects.create_user(username, username + "@email.com", password)
-	user.save()
-	user = authenticate(username = username, password = password)
-	auth_login(request, user)
+		player = players[0]
+	player.name = name
+	player.save()
 	return HttpResponse(status = 200)
 
 def lobby(request):
 	return HttpResponse("this is the lobby")
+
+def newGame(request):
+	game = Game()
 
 def game(request, game_id):
 	return HttpResponse("this is the game for id %s" % game_id)
