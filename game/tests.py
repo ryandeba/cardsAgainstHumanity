@@ -5,19 +5,6 @@ from game.models import Card, Player, Game, GamePlayer, GameCard, GameRound
 
 class GameMethodTests(TestCase):
 
-	def test_addPlayer(self):
-		player = Player.objects.create()
-		game = Game.objects.create()
-
-		now = timezone.now()
-
-		game.addPlayer(player)
-
-		gamePlayers = game.gameplayer_set.all()
-
-		self.assertEqual(len(gamePlayers), 1)
-		self.assertEqual(True, game.datetimeLastPlayerJoined >= now)
-
 	def test_startGame(self):
 		game = Game.objects.create()
 

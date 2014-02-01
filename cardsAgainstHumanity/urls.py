@@ -6,13 +6,17 @@ admin.autodiscover()
 from game import views
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'cardsAgainstHumanity.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+	# Examples:
+	# url(r'^$', 'cardsAgainstHumanity.views.home', name='home'),
+	# url(r'^blog/', include('blog.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^lobby', views.lobby, name = "lobby"),
-    url(r'^game/(?P<game_id>\d+)', views.game, name = "game"),
-    url(r'^setPlayerName', views.setPlayerName, name = "setPlayerName"),
-    url(r'^.*$', views.index, name = "index"),
+	url(r'^admin/', include(admin.site.urls)),
+	url(r'^game/(?P<game_id>\d+)/gamePlayer/(?P<gameplayer_id>\d+)', views.gamePlayer),
+	url(r'^game/(?P<game_id>\d+)/gameRound/(?P<gameround_id>\d+)', views.gameRound),
+	url(r'^game/(?P<game_id>\d+)/addPlayer/(?P<playerhash>)', views.addPlayer), #TODO: validate length of playerhash
+	url(r'^game/(?P<game_id>\d+)', views.game),
+	url(r'^setPlayerName', views.setPlayerName),
+	url(r'^newGame', views.newGame),
+	url(r'^lobby', views.lobby),
+	url(r'^.*$', views.index),
 )

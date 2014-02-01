@@ -13,16 +13,20 @@ class Card(models.Model):
 class Player(models.Model):
 	hash = models.CharField(max_length = 32)
 	name = models.CharField(max_length = 50)
+	datetimeCreated = models.DateTimeField(auto_now = True)
+
+	def __unicode__(self):
+		return self.name
 
 class Game(models.Model):
 	active = models.IntegerField(default = 0) #0 - lobby, 1 - active
-	datetimeLastPlayerJoined = models.DateTimeField(auto_now = True)
+	datetimeCreated = models.DateTimeField(auto_now = True)
 
-	def addPlayer(self, player):
-		if self.active != 0:
-			return False
-		self.datetimeLastPlayerJoined = timezone.now()
-		self.gameplayer_set.create(game = self, player = player)
+	def __unicode__(self):
+		return self.id
+
+	def getNumberOfPlayers(self):
+		return self.gameplayer_set.filter(game = self).count()
 
 	def startGame(self):
 		for card in Card.objects.exclude(numberOfAnswers = 2):
@@ -72,17 +76,23 @@ class Game(models.Model):
 class GamePlayer(models.Model):
 	game = models.ForeignKey(Game)
 	player = models.ForeignKey(Player, null = True)
+	datetimeCreated = models.DateTimeField(auto_now = True)
 
 class GameCard(models.Model):
 	game = models.ForeignKey(Game)
 	card = models.ForeignKey(Card)
 	gamePlayer = models.ForeignKey(GamePlayer, null = True)
 
+	def isHumanPlayer(self):
+		return self.gamePlayer != None
+
 class GameRound(models.Model):
 	game = models.ForeignKey(Game)
 	gameCardQuestion = models.ForeignKey(GameCard)
 	gamePlayerQuestioner = models.ForeignKey(GamePlayer)
+	datetimeCreated = models.DateTimeField(auto_now = True)
 
 class GameRoundAnswer(models.Model):
 	gameRound = models.ForeignKey(GameRound)
 	gameCard = models.ForeignKey(GameCard)
+	datetimeCreated = models.DateTimeField(auto_now = True)
