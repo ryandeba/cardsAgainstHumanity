@@ -22,12 +22,15 @@ class GameMethodTests(TestCase):
 		game = Game.objects.create()
 
 		for i in range(10):
-			Card(numberOfAnswers = 1).save()
+			Card.objects.create(numberOfAnswers = 1, cardType = "A")
+			Card.objects.create(numberOfAnswers = 1, cardType = "Q")
+
+		GamePlayer.objects.create(game = game)
 
 		game.startGame()
 
 		gameCards = game.gamecard_set.all()
-		self.assertEqual(len(gameCards), 10)
+		self.assertEqual(len(gameCards), 20)
 
 	def test_getRandomUnassignedAnswerCard_returnsRandomCard(self):
 		game = Game.objects.create()
@@ -66,7 +69,7 @@ class GameMethodTests(TestCase):
 
 		self.assertEqual(randomCard.id, card2.id)
 
-	def test_getRandomUnusedQuestionQuestionCard_returnsRandomCard(self):
+	def test_getRandomUnusedQuestionCard_returnsRandomCard(self):
 		game = Game.objects.create()
 
 		player = Player()
@@ -83,11 +86,11 @@ class GameMethodTests(TestCase):
 		game.gamecard_set.create(game = game, card = card1, gamePlayer = gamePlayer)
 		game.gamecard_set.create(game = game, card = card2)
 
-		randomCard = game.getRandomUnusedQuestionQuestionCard()
+		randomCard = game.getRandomUnusedQuestionCard()
 
 		self.assertEqual(randomCard.id, card2.id)
 
-	def test_getRandomUnusedQuestionQuestionCard_doesNotReturnAssignedCards(self):
+	def test_getRandomUnusedQuestionCard_doesNotReturnAssignedCards(self):
 		game = Game.objects.create()
 		player = Player.objects.create()
 
@@ -99,7 +102,7 @@ class GameMethodTests(TestCase):
 		game.gamecard_set.create(game = game, card = card1, gamePlayer = gamePlayer)
 		game.gamecard_set.create(game = game, card = card2)
 
-		randomCard = game.getRandomUnusedQuestionQuestionCard()
+		randomCard = game.getRandomUnusedQuestionCard()
 
 		self.assertEqual(randomCard.id, card2.id)
 

@@ -30,7 +30,7 @@ class Game(models.Model):
 
 		self.dealAnswerCards()
 		self.active = 1
-		#self.newRound()
+		self.newRound()
 		self.save()
 
 	def dealAnswerCards(self):
@@ -43,13 +43,13 @@ class Game(models.Model):
 	def getRandomUnassignedAnswerCard(self):
 		return self.gamecard_set.filter(game = self, card__cardType = "A", gamePlayer_id = None).order_by("?").first()
 
-	def getRandomUnusedQuestionQuestionCard(self):
+	def getRandomUnusedQuestionCard(self):
 		return self.gamecard_set.filter(game = self, card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
 
 	def newRound(self):
 		self.gameround_set.create(
 			game = self,
-			question = self.getRandomUnusedQuestionQuestionCard(),
+			gameCardQuestion = self.getRandomUnusedQuestionCard(),
 			gamePlayerQuestioner = self.getNextGameRoundGamePlayerQuestioner()
 		)
 
