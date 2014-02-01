@@ -23,7 +23,7 @@ class Game(models.Model):
 	datetimeCreated = models.DateTimeField(auto_now = True)
 
 	def __unicode__(self):
-		return self.id
+		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
 
 	def getNumberOfPlayers(self):
 		return self.gameplayer_set.filter(game = self).count()
