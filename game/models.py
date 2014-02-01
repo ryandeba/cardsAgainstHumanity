@@ -4,7 +4,7 @@ from django.utils import timezone
 class Card(models.Model):
 	cardType = models.CharField(max_length = 1)
 	text = models.CharField(max_length = 200)
-	numberOfAnswers = models.IntegerField()
+	numberOfAnswers = models.IntegerField(default = 1)
 	expansion = models.CharField(max_length = 100)
 
 	def __unicode__(self):
@@ -21,18 +21,16 @@ class Game(models.Model):
 	def addPlayer(self, player):
 		if self.active != 0:
 			return False
-		#TODO: I get an error if these have not been saved to the database yet...should this be happening?
 		self.datetimeLastPlayerJoined = timezone.now()
-		self.save()
-		player.save()
 		self.gameplayer_set.create(game = self, player = player)
 
 	def startGame(self):
-		self.save()
-		for card in Card.objects.all():
+		for card in Card.objects.exclude(numberOfAnswers = 2):
 			self.gamecard_set.create(game = self, card = card)
-		#TODO: assign 10 cards to each player
+
+		self.dealAnswerCards()
 		self.active = 1
+		#self.newRound()
 		self.save()
 
 	def dealAnswerCards(self):
@@ -45,20 +43,35 @@ class Game(models.Model):
 	def getRandomUnassignedAnswerCard(self):
 		return self.gamecard_set.filter(game = self, card__cardType = "A", gamePlayer_id = None).order_by("?").first()
 
+	def getRandomUnusedQuestionQuestionCard(self):
+		return self.gamecard_set.filter(game = self, card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
+
 	def newRound(self):
-		self.save()
 		self.gameround_set.create(
 			game = self,
-			question = self.getGameRoundQuestion(),
+			question = self.getRandomUnusedQuestionQuestionCard(),
 			gamePlayerQuestioner = self.getNextGameRoundGamePlayerQuestioner()
 		)
 
-	def getRandomUnusedQuestionQuestionCard(self):
-		return self.gamecard_set.filter(game = self, card__cardType = "Q")
+	def getNextGameRoundGamePlayerQuestioner(self):
+		if self.gameround_set.filter(game = self).count() > 0:
+			lastGameRound = self.gameround_set.filter(game = self).order_by("id").first()
+			lastGamePlayerQuestioner = lastGameRound.gamePlayerQuestioner
+
+			gamePlayers = self.gameplayer_set.filter(game = self).order_by("id")
+			foundTheLastPlayer = False
+			for gamePlayer in gamePlayers:
+				if foundTheLastPlayer:
+					return gamePlayer
+				if gamePlayer.id == lastGamePlayerQuestioner.id:
+					foundTheLastPlayer = True
+			return gamePlayers[0]
+		else:
+			return self.gameplayer_set.filter(game = self).order_by("?").first()
 
 class GamePlayer(models.Model):
 	game = models.ForeignKey(Game)
-	player = models.ForeignKey(Player)
+	player = models.ForeignKey(Player, null = True)
 
 class GameCard(models.Model):
 	game = models.ForeignKey(Game)
@@ -67,7 +80,7 @@ class GameCard(models.Model):
 
 class GameRound(models.Model):
 	game = models.ForeignKey(Game)
-	question = models.ForeignKey(GameCard)
+	gameCardQuestion = models.ForeignKey(GameCard)
 	gamePlayerQuestioner = models.ForeignKey(GamePlayer)
 
 class GameRoundAnswer(models.Model):
