@@ -23,6 +23,10 @@ $(function(){
 		initialize: function(){
 			this.loadResults();
 		},
+
+		comparator: function(model){
+			return model.get("secondsSinceLastPlayerJoined");
+		},
 		
 		loadResults: function(){
 			var self = this;

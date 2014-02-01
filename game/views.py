@@ -24,7 +24,11 @@ def setPlayerName(request):
 def lobby(request):
 	responseData = []
 	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated")[:100]:
-		responseData.append({"id": game.id})
+		responseData.append({
+			"id": game.id,
+			"numberOfPlayers": game.getNumberOfPlayers(),
+			"secondsSinceLastPlayerJoined": game.getSecondsSinceLastPlayerJoined(),
+		})
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
 def newGame(request):

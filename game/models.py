@@ -28,6 +28,13 @@ class Game(models.Model):
 	def getNumberOfPlayers(self):
 		return self.gameplayer_set.filter(game = self).count()
 
+	def getSecondsSinceLastPlayerJoined(self):
+		lastPlayerToJoin = self.gameplayer_set.filter(game = self).order_by("-id").first()
+		if lastPlayerToJoin:
+			return (timezone.now() - lastPlayerToJoin.datetimeCreated).total_seconds()
+		else:
+			return 0
+
 	def startGame(self):
 		for card in Card.objects.exclude(numberOfAnswers = 2):
 			self.gamecard_set.create(game = self, card = card)

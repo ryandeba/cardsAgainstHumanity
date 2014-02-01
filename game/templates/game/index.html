@@ -79,7 +79,7 @@
 		</script>
 
 		<script type="text/template" id="template-lobbygame">
-			<a class="list-group-item">Players: 4 | Last player joined 10 minutes ago</a>
+			<a class="list-group-item" href="/game/<%= id %>">ID: <%= id %> | Players: <%= numberOfPlayers %> | Last player joined <%= secondsSinceLastPlayerJoined %> seconds ago</a>
 		</script>
 
 		<script type="text/template" id="template-about">
