@@ -21,7 +21,10 @@ $(function(){
 	};
 
 	var showLobby = function(){
-		var lobbyView = new cardsAgainstHumanity.LobbyView();
+		lobbyGames = new cardsAgainstHumanity.LobbyGames();
+		var lobbyView = new cardsAgainstHumanity.LobbyGamesView({
+			collection: lobbyGames
+		});
 		cardsAgainstHumanity.main.show(lobbyView);
 	};
 
