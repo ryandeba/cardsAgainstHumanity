@@ -8,7 +8,6 @@ $(function(){
 
 	cardsAgainstHumanity.on("initialize:after", function(options){
 		storePlayerHash();
-		showLobby();
 
 		this.listenTo(this.vent, "lobby:newGame", newGame);
 		this.listenTo(this.vent, "showGame", showGame);
@@ -20,7 +19,7 @@ $(function(){
 	var newGame = function(){
 		$.ajax({
 			url: "/newGame",
-			success: function(response){ showGame(response.id) }
+			success: function(response){ cardsAgainstHumanity.vent.trigger("navigate", "game/" + response.id); }
 		});
 	};
 

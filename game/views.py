@@ -8,22 +8,23 @@ import random, json
 def index(request):
 	if request.COOKIES.has_key("playerhash"):
 		playerhash = request.COOKIES["playerhash"]
+		player, created = Player.objects.get_or_create(hash = playerhash)
+		name = player.name
 	else:
 		playerhash = "%032x" % random.getrandbits(128)
-	return render(request, 'game/index.html', {'playerhash': playerhash})
+		name = ""
+	return render(request, 'game/index.html', {'playerhash': playerhash, 'playername': name})
 
-def setPlayerName(request):
-	playerhash = request.POST.get("playerhash", "")
-	name = request.POST.get("name", "")
-
-	player = Player.models.get_or_create(hash = playerhash)
+def setPlayerName(request, name):
+	playerhash = request.COOKIES["playerhash"]
+	player, created = Player.objects.get_or_create(hash = playerhash)
 	player.name = name
 	player.save()
 	return HttpResponse(status = 200)
 
 def lobby(request):
 	responseData = []
-	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated")[:100]:
+	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated","-id")[:100]:
 		responseData.append({
 			"id": game.id,
 			"numberOfPlayers": game.getNumberOfPlayers(),
@@ -33,9 +34,13 @@ def lobby(request):
 
 def newGame(request):
 	game = Game.objects.create()
-	responseData = {
-		"id": game.id,
-	}
+
+	playerhash = request.COOKIES["playerhash"]
+	player, created = Player.objects.get_or_create(hash = playerhash)
+
+	game.gameplayer_set.create(game = game, player = player)
+
+	responseData = { "id": game.id, }
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
 def addPlayer(request, game_id, playerhash):

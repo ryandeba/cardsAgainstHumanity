@@ -1,10 +1,18 @@
 $(function(){
 	var Router = Backbone.Router.extend({
+		initialize: function(){
+			this.listenTo(cardsAgainstHumanity.vent, "navigate", this.navigateTo);
+		},
+
 		routes: {
 			"game/:id": "game",
 			"about": "about",
 			"lobby": "lobby",
 			"": "lobby"
+		},
+
+		navigateTo: function(url){
+			this.navigate(url, {trigger: true});
 		},
 
 		game: function(id){

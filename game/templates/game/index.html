@@ -89,14 +89,14 @@
 			</div>
 
 			<div class="row">
-				<div class="col-xs-12">
+				<div class="col-xs-8 col-xs-offset-2">
 					<div class="panel panel-default">
 						<div class="panel-heading">Lobby</div>
 						<div class="panel-body">
 
 							<p class="input-group">
-								<span class="input-group-addon">Username</span>
-								<input type="text" class="form-control" name="username" placeholder="Username" required />
+								<input type="text" class="form-control" name="username" placeholder="Username" value="{{ playername }}" />
+								<span class="input-group-btn"><button type="button" class="btn btn-primary">Save</button></span>
 							</p>
 
 							<div class="list-group js-lobbygames"></div>
@@ -111,7 +111,21 @@
 		</script>
 
 		<script type="text/template" id="template-lobbygamelistitem">
-			<a class="list-group-item" href="#game/<%= id %>">ID: <%= id %> | Players: <%= numberOfPlayers %> | Last player joined <%= secondsSinceLastPlayerJoined %> seconds ago</a>
+			<a class="list-group-item" href="#game/<%= id %>">
+				ID: <%= id %> |
+				Players: <%= numberOfPlayers %> |
+				<%
+					var roundedSeconds = Math.round(secondsSinceLastPlayerJoined);
+					var minutes = roundedSeconds / 60;
+					var hours = minutes / 60;
+					var formattedTimeString = "just now";
+					if (hours > 0)
+						formattedTimeString = "over an hour ago :(";
+					else if (minutes > 1)
+						formattedTimeString = minutes + " minutes ago";
+				%>
+				Last player joined <%= formattedTimeString %>
+			</a>
 		</script>
 
 		<script type="text/template" id="template-about">
