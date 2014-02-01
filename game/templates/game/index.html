@@ -19,7 +19,9 @@
 
 		<script src="{% static 'game/js/cardsAgainstHumanity.js' %}"></script>
 		<script src="{% static 'game/js/AboutView.js' %}"></script>
-		<script src="{% static 'game/js/LobbyView.js' %}"></script>
+		<script src="{% static 'game/js/Lobby.js' %}"></script>
+		<script src="{% static 'game/js/Game.js' %}"></script>
+		<script src="{% static 'game/js/Router.js' %}"></script>
 
 		<script>
 			$(function(){
@@ -47,6 +49,36 @@
 
 		<div id="main" class="container">
 		</div>
+
+		<script type="text/template" id="template-game-active">
+			<div class="row">
+
+				<div class="col-xs-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">Your Answer Cards</div>
+						<div class="panel-body">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-xs-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">Current Round</div>
+						<div class="panel-body">
+						</div>
+					</div>
+				</div>
+
+				<div class="col-xs-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">Players</div>
+						<div class="panel-body">
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</script>
 
 		<script type="text/template" id="template-lobby">
 			<div class="row">
@@ -78,8 +110,8 @@
 			</div>
 		</script>
 
-		<script type="text/template" id="template-lobbygame">
-			<a class="list-group-item" href="/game/<%= id %>">ID: <%= id %> | Players: <%= numberOfPlayers %> | Last player joined <%= secondsSinceLastPlayerJoined %> seconds ago</a>
+		<script type="text/template" id="template-lobbygamelistitem">
+			<a class="list-group-item" href="#game/<%= id %>">ID: <%= id %> | Players: <%= numberOfPlayers %> | Last player joined <%= secondsSinceLastPlayerJoined %> seconds ago</a>
 		</script>
 
 		<script type="text/template" id="template-about">

@@ -4,17 +4,9 @@ $(function(){
 	});
 
 	cardsAgainstHumanity.LobbyGameView = Backbone.Marionette.ItemView.extend({
-		template: "#template-lobbygame",
+		template: "#template-lobbygamelistitem",
 
-		tagName: "span",
-
-		events: {
-			"click a": "click"
-		},
-
-		click: function(e){
-			e.preventDefault();
-		}
+		tagName: "span"
 	});
 
 	cardsAgainstHumanity.LobbyGames = Backbone.Collection.extend({
@@ -32,7 +24,6 @@ $(function(){
 			var self = this;
 			$.ajax({
 				url: "/lobby",
-				type: "GET",
 				success: function(response){ self.loadResultsSuccess(response); }
 			});
 		},
@@ -57,6 +48,10 @@ $(function(){
 
 		refreshLobby: function(){
 			this.collection.loadResults();
+		},
+
+		newGame: function(){
+			cardsAgainstHumanity.vent.trigger("lobby:newGame");
 		}
 	});
 

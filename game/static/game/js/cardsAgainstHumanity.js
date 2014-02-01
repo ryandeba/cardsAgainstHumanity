@@ -9,10 +9,25 @@ $(function(){
 	cardsAgainstHumanity.on("initialize:after", function(options){
 		storePlayerHash();
 		showLobby();
+
+		this.listenTo(this.vent, "lobby:newGame", newGame);
+		this.listenTo(this.vent, "showGame", showGame);
+		this.listenTo(this.vent, "showAbout", showAbout);
+		this.listenTo(this.vent, "showLobby", showLobby);
+		Backbone.history.start();
 	});
 
+	var newGame = function(){
+		$.ajax({
+			url: "/newGame",
+			success: function(response){ showGame(response.id) }
+		});
+	};
+
 	var storePlayerHash = function(){
-		$.cookie("playerhash", $("#playerhash").val(), {path: "/"});
+		var playerhash = $("#playerhash").val();
+		$.cookie("playerhash", playerhash, {path: "/"});
+		cardsAgainstHumanity.playerhash = playerhash;
 	};
 
 	var showAbout = function(){
@@ -21,11 +36,19 @@ $(function(){
 	};
 
 	var showLobby = function(){
-		lobbyGames = new cardsAgainstHumanity.LobbyGames();
+		var lobbyGames = new cardsAgainstHumanity.LobbyGames();
 		var lobbyView = new cardsAgainstHumanity.LobbyGamesView({
 			collection: lobbyGames
 		});
 		cardsAgainstHumanity.main.show(lobbyView);
+	};
+
+	var showGame = function(id){
+		var game = new cardsAgainstHumanity.Game({id: id});
+		var gameView = new cardsAgainstHumanity.GameView({
+			model: game
+		});
+		cardsAgainstHumanity.main.show(gameView);
 	};
 
 });
