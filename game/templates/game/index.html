@@ -52,32 +52,39 @@
 
 		<script type="text/template" id="template-game-active">
 			<div class="row">
-
-				<div class="col-xs-4">
-					<div class="panel panel-default">
-						<div class="panel-heading">Your Answer Cards</div>
-						<div class="panel-body">
-						</div>
+				<div class="col-xs-8">
+					<div class="well" style="height: 300px;">
+						<h3 class="text-center"><%= active == 0 ? "Waiting for other players to join" : "" %></h3>
 					</div>
 				</div>
-
 				<div class="col-xs-4">
-					<div class="panel panel-default">
-						<div class="panel-heading">Current Round</div>
-						<div class="panel-body">
-						</div>
+					<div class="well" style="height: 300px;">
+						<h3 class="text-center">Players</h3>
+						<ol class="js-gameplayers">
+							<% for (var i = 0; i < gamePlayers.length; i++){ %>
+								<%= (i + 1).toString() + ":"  %>
+							<% } %>
+						</ol>
 					</div>
 				</div>
-
-				<div class="col-xs-4">
-					<div class="panel panel-default">
-						<div class="panel-heading">Players</div>
-						<div class="panel-body">
-						</div>
-					</div>
-				</div>
-
 			</div>
+
+			<div class="row">
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<div class="col-xs-2"><div class="well">some answer text</div></div>
+			</div>
+		</script>
+
+		<script type="text/template" id="template-gameplayer">
+			<%= name %> asdf
 		</script>
 
 		<script type="text/template" id="template-lobby">

@@ -43,7 +43,7 @@ $(function(){
 	};
 
 	var showGame = function(id){
-		var game = new cardsAgainstHumanity.Game({id: id});
+		 game = new cardsAgainstHumanity.Game({id: id});
 		var gameView = new cardsAgainstHumanity.GameView({
 			model: game
 		});
