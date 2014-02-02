@@ -3,16 +3,11 @@ $(function(){
 	cardsAgainstHumanity.Game = Backbone.Model.extend({
 		defaults: {
 			active: 0,
-			gamePlayers: undefined,
+			gamePlayers: [],
 			gameRounds: undefined
 		},
 
 		initialize: function(){
-			this.set("gamePlayers", new GamePlayers());
-			this.get("gamePlayers").url = "game/" + this.get("id") + "/gamePlayer";
-			this.set("gameRounds", new GameRounds());
-			this.get("gameRounds").url = "game/" + this.get("id") + "/gameRound";
-
 			this.load();
 		},
 
@@ -27,52 +22,17 @@ $(function(){
 		},
 
 		loadSuccess: function(response){
-			this.get("gamePlayers").reset(response.gamePlayers);
-
-			this.get("gameRounds").reset(response.gameRounds);
+			this.set(response);
+			this.trigger("change");
 		}
 	});
 
-	cardsAgainstHumanity.GameView = Backbone.View.extend({
-		initialize: function(){
-			//this.listenTo(this.model, "change", this.render);
-		},
-
-		template: _.template($("#template-game-active").html()),
-
-		render: function(){
-			this.$el.html(this.template(this.model.toJSON()));
-			//this.renderGamePlayers();
-			return this;
-		},
-
-		renderGamePlayers: function(){
-			var self = this;
-			var gamePlayersView = new GamePlayersView({
-				collection: self.model.get("gamePlayers"),
-				el: self.$el.find(".js-gameplayers")
-			});
-		}
-	});
-
-	var GamePlayer = Backbone.Model.extend({
-		idAttribute: "id",
+	cardsAgainstHumanity.GameView = Backbone.Marionette.ItemView.extend({
+		template: "#template-game",
 
 		initialize: function(){
-			this.fetch();
+			this.listenTo(this.model, "change", this.render);
 		}
-	});
-
-	var GamePlayerView = Backbone.Marionette.ItemView.extend({
-		template: "#template-gameplayer"
-	});
-
-	var GamePlayers = Backbone.Collection.extend({
-		model: GamePlayer
-	});
-
-	var GamePlayersView = Backbone.Marionette.CollectionView.extend({
-		itemView: GamePlayerView
 	});
 
 	var GameRound = Backbone.Model.extend({

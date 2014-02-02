@@ -35,48 +35,52 @@ def lobby(request):
 def newGame(request):
 	game = Game.objects.create()
 
-	playerhash = request.COOKIES["playerhash"]
-	player, created = Player.objects.get_or_create(hash = playerhash)
-
-	game.gameplayer_set.create(game = game, player = player)
-
 	responseData = { "id": game.id, }
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
-def addPlayer(request, game_id, playerhash):
+def addBot(request, game_id):
 	game = Game.objects.get(id = game_id)
-	if Player.objects.filter(hash = playerhash).exists():
-		player = Player.objects.get(hash = playerhash)
-		game.gameplayer_set.get_or_create(game = game, player = player)
-	else:
-		game.gameplayer_set.create(game = game)
+	game.gameplayer_set.create(game = game)
+	return HttpResponse(status = 200)
+
+def startGame(request, game_id):
+	game = Game.objects.get(id = game_id)
+	if game.active == 0 and game.getNumberOfPlayers() > 2:
+		game.startGame()
 	return HttpResponse(status = 200)
 
 def game(request, game_id):
 	game = Game.objects.get(id = game_id)
-	responseData = {
+
+	if game.active == 0:
+		player = Player.objects.get(hash = request.COOKIES["playerhash"])
+		game.gameplayer_set.get_or_create(game = game, player = player)
+
+	return HttpResponse(json.dumps(getGameJSON(game)), content_type="application/json")
+
+def getGameJSON(game):
+	return {
 		"id": game.id,
 		"active": game.active,
-		"gamePlayers": [{"id": gamePlayer.id} for gamePlayer in game.gameplayer_set.filter(game = game).order_by("id")],
-		"gameRounds": [{"id": gameRound.id} for gameRound in game.gameround_set.filter(game = game).order_by("id")],
-	}
-	return HttpResponse(json.dumps(responseData), content_type="application/json")
-
-def gamePlayer(request, game_id, gameplayer_id):
-	game = Game.objects.get(id = game_id)
-	gamePlayer = game.gameplayer_set.get(id = gameplayer_id)
-	name = ""
-	if gamePlayer.player:
-		name = gamePlayer.player.name
-	responseData = {
-		"id": gamePlayer.id,
-		"name": name,
-		"gameCards": [
-			{"id": gameCard.id, "text": gameCard.card.text}
-			for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).order_by("id")
+		"gamePlayers": [
+			{
+				"id": gamePlayer.id,
+				"hash": gamePlayer.getHash(),
+				"name": gamePlayer.getName(),
+				"gameCards": [
+					{
+						"id": gameCard.id,
+						"text": gameCard.card.text
+					} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).order_by("id")
+				],
+			} for gamePlayer in game.gameplayer_set.filter(game = game).order_by("id")
+		],
+		"gameRounds": [
+			{
+				"id": gameRound.id
+			} for gameRound in game.gameround_set.filter(game = game).order_by("id")
 		],
 	}
-	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
 def gameRound(request, game_id, gameround_id):
 	game = Game.objects.get(id = game_id)

@@ -85,13 +85,20 @@ class GamePlayer(models.Model):
 	player = models.ForeignKey(Player, null = True)
 	datetimeCreated = models.DateTimeField(auto_now = True)
 
+	def getHash(self):
+		if self.player:
+			return self.player.hash
+		return ""
+
+	def getName(self):
+		if self.player and len(self.player.name) > 0:
+			return self.player.name
+		return "Anonymous"
+
 class GameCard(models.Model):
 	game = models.ForeignKey(Game)
 	card = models.ForeignKey(Card)
 	gamePlayer = models.ForeignKey(GamePlayer, null = True)
-
-	def isHumanPlayer(self):
-		return self.gamePlayer != None
 
 class GameRound(models.Model):
 	game = models.ForeignKey(Game)
