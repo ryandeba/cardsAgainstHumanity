@@ -69,7 +69,7 @@ def getGameJSON(game):
 				"name": gamePlayer.getName(),
 				"gameCards": [
 					{
-						"id": gameCard.id,
+						"card_id": gameCard.card.id,
 						"text": gameCard.card.text
 					} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).order_by("id")
 				],

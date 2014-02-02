@@ -33,7 +33,8 @@ $(function(){
 		},
 
 		getThisPlayersAnswerCards: function(){
-			return [];
+			var thisGamePlayer = _.findWhere(this.get("gamePlayers"), {hash: cardsAgainstHumanity.playerhash});
+			return thisGamePlayer != undefined ? thisGamePlayer.gameCards : [];
 		},
 
 		load: function(){

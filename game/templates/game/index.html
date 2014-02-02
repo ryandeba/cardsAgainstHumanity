@@ -75,16 +75,9 @@
 			</div>
 
 			<div class="row">
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
-				<div class="col-xs-2"><div class="well">some answer text</div></div>
+				<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
+					<div class="col-xs-2"><div class="well"><%= thisPlayersAnswerCards[i].text %></div></div>
+				<% } %>
 			</div>
 		</script>
 
