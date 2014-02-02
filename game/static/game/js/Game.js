@@ -4,11 +4,36 @@ $(function(){
 		defaults: {
 			active: 0,
 			gamePlayers: [],
-			gameRounds: undefined
+			gameRounds: []
 		},
 
 		initialize: function(){
 			this.load();
+		},
+
+		toJSON: function(){
+			return _.extend(this.attributes, {
+				currentRoundQuestioner: this.getCurrentRoundQuestioner(),
+				currentRoundQuestion: this.getCurrentRoundQuestion(),
+				thisPlayersAnswerCards: this.getThisPlayersAnswerCards()
+			});
+		},
+
+		getCurrentRoundQuestioner: function(){
+			if (this.get("gameRounds").length == 0)
+				return "";
+			var currentRoundQuestion_id = _.last(this.get("gameRounds")).gamePlayerQuestioner_id;
+			return "{someone}";
+		},
+
+		getCurrentRoundQuestion: function(){
+			if (this.get("gameRounds").length == 0)
+				return "";
+			return _.last(this.get("gameRounds")).question;
+		},
+
+		getThisPlayersAnswerCards: function(){
+			return [];
 		},
 
 		load: function(){

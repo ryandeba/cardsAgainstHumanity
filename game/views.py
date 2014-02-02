@@ -77,7 +77,9 @@ def getGameJSON(game):
 		],
 		"gameRounds": [
 			{
-				"id": gameRound.id
+				"id": gameRound.id,
+				"gamePlayerQuestioner_id": gameRound.gamePlayerQuestioner_id,
+				"question": gameRound.gameCardQuestion.card.text,
 			} for gameRound in game.gameround_set.filter(game = game).order_by("id")
 		],
 	}
