@@ -36,8 +36,7 @@ class Game(models.Model):
 			return 0
 
 	def startGame(self):
-		for card in Card.objects.exclude(numberOfAnswers = 2):
-			self.gamecard_set.create(game = self, card = card)
+		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2)])
 
 		self.dealAnswerCards()
 		self.active = 1
