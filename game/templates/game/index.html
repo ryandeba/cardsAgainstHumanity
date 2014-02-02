@@ -6,8 +6,13 @@
 
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/bootstrap.min.css' %}" />
 		<style>
-			#main {
-				padding-top: 70px;
+			body {
+				padding-top: 80px;
+			}
+
+			.card:hover {
+				box-shadow: 0px 0px 15px #fff;
+				cursor: pointer;
 			}
 		</style>
 
@@ -53,9 +58,9 @@
 		<script type="text/template" id="template-game">
 			<div class="row">
 				<div class="col-xs-8">
-					<div class="well" style="height: 300px;">
+					<div class="well" style="height: 240px;">
 						<% if (active == 1) { %>
-							<h3 class="text-center"><%= currentRoundQuestioner %> wants to know...</h3>
+							<h3 class="text-center"><%= currentRoundQuestioner.name %> wants to know...</h3>
 							<h1 class="text-center"><%= currentRoundQuestion %></h1>
 						<% } else { %>
 							<h3 class="text-center">Waiting for other players to join</h3>
@@ -63,11 +68,14 @@
 					</div>
 				</div>
 				<div class="col-xs-4">
-					<div class="well" style="height: 300px;">
+					<div class="well" style="height: 240px;">
 						<h3 class="text-center">Players</h3>
 						<ol class="js-gameplayers">
 							<% for (var i = 0; i < gamePlayers.length; i++){ %>
-								<li><%= gamePlayers[i].name  %></li>
+								<li>
+									<%= gamePlayers[i].name  %>
+									<%= gamePlayers[i].id == currentRoundQuestioner.id ? "*" : "" %>
+								</li>
 							<% } %>
 						</ol>
 					</div>
@@ -76,7 +84,7 @@
 
 			<div class="row">
 				<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
-					<div class="col-xs-2"><div class="well"><%= thisPlayersAnswerCards[i].text %></div></div>
+					<div class="col-xs-2"><div class="well card" style="height: 200px;"><%= thisPlayersAnswerCards[i].text %></div></div>
 				<% } %>
 			</div>
 		</script>

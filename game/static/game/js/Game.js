@@ -22,8 +22,8 @@ $(function(){
 		getCurrentRoundQuestioner: function(){
 			if (this.get("gameRounds").length == 0)
 				return "";
-			var currentRoundQuestion_id = _.last(this.get("gameRounds")).gamePlayerQuestioner_id;
-			return "{someone}";
+			var currentRoundQuestioner_id = _.last(this.get("gameRounds")).gamePlayerQuestioner_id;
+			return _.findWhere(this.get("gamePlayers"), {id: currentRoundQuestioner_id});
 		},
 
 		getCurrentRoundQuestion: function(){
