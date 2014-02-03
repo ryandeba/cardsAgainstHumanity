@@ -62,8 +62,12 @@
 						<% if (active == 1) { %>
 							<h3 class="text-center"><%= currentRoundQuestioner.name %> wants to know...</h3>
 							<h1 class="text-center"><%= currentRoundQuestion %></h1>
+							<button type="button" class="btn btn-primary js-forceanswers">Force Answers</button>
 						<% } else { %>
 							<h3 class="text-center">Waiting for other players to join</h3>
+							<% if (gamePlayers.length >= 3){ %>
+								<button type="button" class="btn btn-primary js-startgame">Start Game</button>
+							<% } %>
 						<% } %>
 					</div>
 				</div>
@@ -78,13 +82,20 @@
 								</li>
 							<% } %>
 						</ol>
+						<% if (active == 0){ %>
+							<button type="button" class="btn btn-primary js-add-bot">Add bot</button>
+						<% } %>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
-					<div class="col-xs-2"><div class="well card" style="height: 200px;"><%= thisPlayersAnswerCards[i].text %></div></div>
+					<div class="col-xs-2">
+						<div class="well card js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>" style="height: 200px;">
+							<%= thisPlayersAnswerCards[i].text %>
+						</div>
+					</div>
 				<% } %>
 			</div>
 		</script>

@@ -108,4 +108,6 @@ class GameRound(models.Model):
 class GameRoundAnswer(models.Model):
 	gameRound = models.ForeignKey(GameRound)
 	gameCard = models.ForeignKey(GameCard)
+	gamePlayer = models.ForeignKey(GamePlayer)
 	datetimeCreated = models.DateTimeField(auto_now = True)
+	winner = models.IntegerField(default = 0)

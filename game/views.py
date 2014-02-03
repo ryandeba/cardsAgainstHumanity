@@ -80,9 +80,36 @@ def getGameJSON(game):
 				"id": gameRound.id,
 				"gamePlayerQuestioner_id": gameRound.gamePlayerQuestioner_id,
 				"question": gameRound.gameCardQuestion.card.text,
+				"answers": [
+					{
+						"text": answer.gameCard.card.text,
+						"gameplayer_id": answer.gamePlayer.id,
+						"winner": answer.winner,
+					} for answer in gameRound.gameroundanswer_set.all()
+				],
 			} for gameRound in game.gameround_set.filter(game = game).order_by("id")
 		],
 	}
+
+def submitAnswer(request, game_id, card_id):
+	#TODO: seems like there's probably a better way to accomplish this...
+	player = Player.objects.get(hash = request.COOKIES["playerhash"])
+	game = Game.objects.get(id = game_id)
+	gamePlayer = game.gameplayer_set.get(game = game, player = player)
+	gameCard = game.gamecard_set.get(game = game, gamePlayer = gamePlayer, card_id = card_id)
+	gameRound = game.gameround_set.filter(game = game).order_by("-id").first()
+
+	if gameRound.gameroundanswer_set.filter(gameRound = gameRound, gamePlayer = gamePlayer).count() == 0:
+		gameCard.gamePlayer = None
+		gameCard.save()
+		gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer)
+	return HttpResponse(status = 200)
+
+def forceAnswers(request, game_id):
+	game = Game.objects.get(id = game_id)
+	gamePlayers = game.gameplayer_set.all()
+	gameRound = game.gameround_set.filter(game = game).order_by("-id").first()
+	return HttpResponse(status = 200)
 
 def gameRound(request, game_id, gameround_id):
 	game = Game.objects.get(id = game_id)
