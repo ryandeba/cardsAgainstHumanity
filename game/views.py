@@ -84,6 +84,7 @@ def getGameJSON(game):
 					{
 						"text": answer.gameCard.card.text,
 						"gameplayer_id": answer.gamePlayer.id,
+						"card_id": answer.gameCard.card.id,
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all()
 				],
@@ -105,10 +106,32 @@ def submitAnswer(request, game_id, card_id):
 		gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer)
 	return HttpResponse(status = 200)
 
+def chooseWinner(request, game_id, card_id):
+	game = Game.objects.get(id = game_id)
+	gameRound = game.gameround_set.filter(game = game).order_by("-id").first()
+	gameCard = game.gamecard_set.get(game = game, card_id = card_id)
+	gameRoundAnswer = gameRound.gameroundanswer_set.get(gameRound = gameRound, gameCard = gameCard)
+
+	gameRoundAnswer.winner = 1
+	gameRoundAnswer.save()
+
+	return HttpResponse(status = 200)
+
 def forceAnswers(request, game_id):
 	game = Game.objects.get(id = game_id)
-	gamePlayers = game.gameplayer_set.all()
 	gameRound = game.gameround_set.filter(game = game).order_by("-id").first()
+	gameRoundAnswers = gameRound.gameroundanswer_set.all()
+
+	for gamePlayer in game.gameplayer_set.all():
+		if gameRound.gameplayerquestioner_id == gamePlayer.id:
+			continue
+		if gameRound.gameroundanswer_set.filter(gameRound = gameRound, gamePlayer = gamePlayer).count() > 0:
+			continue
+		randomGameCard = gamePlayer.gamecard_set.filter(gamePlayer = gamePlayer).order_by("?").first()
+		randomGameCard.gamePlayer = None
+		randomGameCard.save()
+		gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = randomGameCard, gamePlayer = gamePlayer)
+
 	return HttpResponse(status = 200)
 
 def gameRound(request, game_id, gameround_id):
