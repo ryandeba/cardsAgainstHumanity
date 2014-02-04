@@ -105,6 +105,19 @@ class Game(models.Model):
 		else:
 			return self.gameplayer_set.filter(game = self).order_by("?").first()
 
+	def gamePlayerSubmitsAnswerCard(self, gamePlayer, gameCard):
+		currentRound = self.getMostRecentRound()
+		if (currentRound 
+				and currentRound.isComplete() == False \
+				and currentRound.gamePlayerQuestioner.id != gamePlayer.id \
+				and currentRound.gameroundanswer_set.filter(gameRound = currentRound, gamePlayer = gamePlayer).count() == 0
+		):
+			gameCard.gamePlayer = None
+			gameCard.save()
+			currentRound.gameroundanswer_set.create(gameRound = currentRound, gameCard = gameCard, gamePlayer = gamePlayer)
+			return True
+		return False
+
 class GamePlayer(models.Model):
 	game = models.ForeignKey(Game)
 	player = models.ForeignKey(Player, null = True)
@@ -137,6 +150,6 @@ class GameRound(models.Model):
 class GameRoundAnswer(models.Model):
 	gameRound = models.ForeignKey(GameRound)
 	gameCard = models.ForeignKey(GameCard)
-	gamePlayer = models.ForeignKey(GamePlayer)
+	gamePlayer = models.ForeignKey(GamePlayer) #this might seem weird in conjunction with gameCard, but gameCard gets unassigned from the gamePlayer when added
 	datetimeCreated = models.DateTimeField(auto_now = True)
 	winner = models.IntegerField(default = 0)

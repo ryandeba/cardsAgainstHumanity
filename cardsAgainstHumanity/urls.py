@@ -11,7 +11,6 @@ urlpatterns = patterns('',
 	# url(r'^blog/', include('blog.urls')),
 
 	url(r'^admin/', include(admin.site.urls)),
-	url(r'^game/(?P<game_id>\d+)/gameRound/(?P<gameround_id>\d+)', views.gameRound),
 	url(r'^game/(?P<game_id>\d+)/submitAnswer/(?P<card_id>\d+)', views.submitAnswer),
 	url(r'^game/(?P<game_id>\d+)/chooseWinner/(?P<card_id>\d+)', views.chooseWinner),
 	url(r'^game/(?P<game_id>\d+)/forceAnswers', views.forceAnswers),

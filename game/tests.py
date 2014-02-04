@@ -161,6 +161,54 @@ class GameMethodTests(TestCase):
 		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 0)
 		self.assertEqual(game.isReadyToStartNewRound(), False)
 
+	def test_gamePlayerSubmitsAnswerCard_returnsFalseIfThereIsNoCurrentRound(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		self.assertEqual(game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard), False)
+
+	def test_gamePlayerSubmitsAnswerCard_returnsFalseIfCurrentRoundIsComplete(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		otherGamePlayer = game.gameplayer_set.create(game = game)
+		otherGameCard = game.gamecard_set.create(game = game, gamePlayer = otherGamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = otherGameCard, gamePlayerQuestioner = otherGamePlayer)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 1)
+		self.assertEqual(game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard), False)
+
+	def test_gamePlayerSubmitsAnswerCard_returnsFalseIfGamePlayerAlreadyAnsweredThisRound(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		otherGamePlayer = game.gameplayer_set.create(game = game)
+		otherGameCard = game.gamecard_set.create(game = game, gamePlayer = otherGamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = otherGameCard, gamePlayerQuestioner = otherGamePlayer)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 0)
+		self.assertEqual(game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard), False)
+
+	def test_gamePlayerSubmitsAnswerCard_returnsFalseIfGamePlayerIsGamePlayerQuestioner(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		otherGamePlayer = game.gameplayer_set.create(game = game)
+		otherGameCard = game.gamecard_set.create(game = game, gamePlayer = otherGamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = otherGameCard, gamePlayerQuestioner = gamePlayer)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 0)
+		self.assertEqual(game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard), False)
+
+	def test_gamePlayerSubmitsAnswerCard_returnsTrueAndOtherAssertionsWhenEverythingIsSetJustRight(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		otherGamePlayer = game.gameplayer_set.create(game = game)
+		otherGameCard = game.gamecard_set.create(game = game, gamePlayer = otherGamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = otherGameCard, gamePlayerQuestioner = otherGamePlayer)
+
+		self.assertEqual(game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard), True)
+		self.assertEqual(gameCard.gamePlayer, None)
+		self.assertEqual(gameRound.gameroundanswer_set.all().count(), 1)
+
 class GameRoundMethodTests(TestCase):
 
 	def test_isComplete_returnsTrueWhenThereIsAWinner(self):
