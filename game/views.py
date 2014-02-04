@@ -61,6 +61,31 @@ def game(request, game_id):
 	gamePlayer = game.gameplayer_set.get(player = player)
 	return HttpResponse(json.dumps(getGameJSON(game, gamePlayer)), content_type="application/json")
 
+def submitAnswer(request, game_id, card_id):
+	player = Player.objects.get(hash = request.COOKIES["playerhash"])
+	game = Game.objects.get(id = game_id)
+	gamePlayer = game.gameplayer_set.get(game = game, player = player)
+	gameCard = game.gamecard_set.get(game = game, gamePlayer = gamePlayer, card_id = card_id)
+	game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard)
+	return HttpResponse(status = 200)
+
+def chooseWinner(request, game_id, card_id):
+	game = Game.objects.get(id = game_id)
+	player = Player.objects.get(hash = request.COOKIES["playerhash"])
+	gameCard = game.gamecard_set.get(game = game, card_id = card_id)
+	gamePlayer = game.gameplayer_set.get(game = game, player = player)
+	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
+	return HttpResponse(status = 200)
+
+def forceAnswers(request, game_id):
+	game = Game.objects.get(id = game_id)
+
+	for gamePlayer in game.gameplayer_set.all():
+		randomGameCard = gamePlayer.gamecard_set.filter(gamePlayer = gamePlayer).order_by("?").first()
+		game.gamePlayerSubmitsAnswerCard(gamePlayer, randomGameCard)
+
+	return HttpResponse(status = 200)
+
 def getGameJSON(game, thisPlayer):
 	return {
 		"id": game.id,
@@ -96,39 +121,3 @@ def getGameJSON(game, thisPlayer):
 		],
 	}
 
-def submitAnswer(request, game_id, card_id):
-	player = Player.objects.get(hash = request.COOKIES["playerhash"])
-	game = Game.objects.get(id = game_id)
-	gamePlayer = game.gameplayer_set.get(game = game, player = player)
-	gameCard = game.gamecard_set.get(game = game, gamePlayer = gamePlayer, card_id = card_id)
-	game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard)
-	return HttpResponse(status = 200)
-
-def chooseWinner(request, game_id, card_id):
-	game = Game.objects.get(id = game_id)
-	gameRound = game.gameround_set.filter(game = game).order_by("-id").first()
-	gameCard = game.gamecard_set.get(game = game, card_id = card_id)
-	gameRoundAnswer = gameRound.gameroundanswer_set.get(gameRound = gameRound, gameCard = gameCard)
-
-	gameRoundAnswer.winner = 1
-	gameRoundAnswer.save()
-
-	return HttpResponse(status = 200)
-
-def forceAnswers(request, game_id):
-	game = Game.objects.get(id = game_id)
-
-	for gamePlayer in game.gameplayer_set.all():
-		randomGameCard = gamePlayer.gamecard_set.filter(gamePlayer = gamePlayer).order_by("?").first()
-		game.gamePlayerSubmitsAnswerCard(gamePlayer, randomGameCard)
-
-	return HttpResponse(status = 200)
-
-def gameRound(request, game_id, gameround_id):
-	game = Game.objects.get(id = game_id)
-	gameRound = game.gameround_set.filter(game = game)
-	responseData = {
-		"id": gameRound.id,
-		"question": gameRound.gameCardQuestion.card.text,
-	}
-	return HttpResponse(json.dumps(responseData), content_type="application/json")

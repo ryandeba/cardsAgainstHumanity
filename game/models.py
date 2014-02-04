@@ -120,7 +120,7 @@ class Game(models.Model):
 
 	def gamePlayerPicksWinningAnswerCard(self, gamePlayer, gameCard):
 		gameRound = self.getMostRecentRound()
-		if gameRound.isComplete() == False:
+		if gameRound and gameRound.isComplete() == False and gameRound.gamePlayerQuestioner_id == gamePlayer.id:
 			gameRoundAnswer = gameRound.gameroundanswer_set.get(gameRound = gameRound, gameCard = gameCard)
 			gameRoundAnswer.winner = 1
 			gameRoundAnswer.save()
