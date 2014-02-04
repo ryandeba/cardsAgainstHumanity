@@ -16,7 +16,7 @@ def index(request):
 
 def setPlayerName(request, name):
 	playerhash = request.COOKIES["playerhash"]
-	player, created = Player.objects.get(hash = playerhash)
+	player = Player.objects.get(hash = playerhash)
 	player.name = name
 	player.save()
 	return HttpResponse(status = 200)
