@@ -133,6 +133,9 @@ class GamePlayer(models.Model):
 			return self.player.name
 		return "Anonymous"
 
+	def getPoints(self):
+		return self.gameroundanswer_set.filter(gamePlayer = self, winner = 1).count()
+
 class GameCard(models.Model):
 	game = models.ForeignKey(Game)
 	card = models.ForeignKey(Card)

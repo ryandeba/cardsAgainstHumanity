@@ -22,8 +22,17 @@ def setPlayerName(request, name):
 	return HttpResponse(status = 200)
 
 def lobby(request):
+	playerhash = request.COOKIES["playerhash"]
+	player = Player.objects.get(hash = playerhash)
+
 	responseData = []
-	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated","-id")[:100]:
+	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated","-id")[:50]:
+		responseData.append({
+			"id": game.id,
+			"numberOfPlayers": game.getNumberOfPlayers(),
+			"secondsSinceLastPlayerJoined": game.getSecondsSinceLastPlayerJoined(),
+		})
+	for game in Game.objects.filter(active = 1, gameplayer__player_id = player.id):
 		responseData.append({
 			"id": game.id,
 			"numberOfPlayers": game.getNumberOfPlayers(),
@@ -47,13 +56,12 @@ def startGame(request, game_id):
 
 def game(request, game_id):
 	game = Game.objects.get(id = game_id)
-
 	player = Player.objects.get(hash = request.COOKIES["playerhash"])
 	game.addPlayer(player)
+	gamePlayer = game.gameplayer_set.get(player = player)
+	return HttpResponse(json.dumps(getGameJSON(game, gamePlayer)), content_type="application/json")
 
-	return HttpResponse(json.dumps(getGameJSON(game)), content_type="application/json")
-
-def getGameJSON(game):
+def getGameJSON(game, thisPlayer):
 	return {
 		"id": game.id,
 		"active": game.active,
@@ -62,11 +70,12 @@ def getGameJSON(game):
 				"id": gamePlayer.id,
 				"hash": gamePlayer.getHash(),
 				"name": gamePlayer.getName(),
+				"points": gamePlayer.getPoints(),
 				"gameCards": [
 					{
 						"card_id": gameCard.card.id,
 						"text": gameCard.card.text
-					} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).order_by("id")
+					} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).filter(gamePlayer = thisPlayer).order_by("id")
 				],
 			} for gamePlayer in game.gameplayer_set.filter(game = game).order_by("id")
 		],
