@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-SECONDS_TO_WAIT_BETWEEN_ROUNDS = 10
+SECONDS_TO_WAIT_BETWEEN_ROUNDS = 20
 
 class Card(models.Model):
 	cardType = models.CharField(max_length = 1)
@@ -46,7 +46,6 @@ class Game(models.Model):
 	def startGame(self):
 		if self.isReadyToStart():
 			self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2)])
-			self.dealAnswerCards()
 			self.active = 1
 			self.newRound()
 			self.save()
@@ -75,6 +74,7 @@ class Game(models.Model):
 				gameCardQuestion = self.getRandomUnusedQuestionCard(),
 				gamePlayerQuestioner = self.getNextGameRoundGamePlayerQuestioner()
 			)
+			self.dealAnswerCards()
 		return
 		
 	def isReadyToStartNewRound(self):
@@ -84,7 +84,7 @@ class Game(models.Model):
 		if gameRound == None:
 			return True
 		if (gameRound.isComplete()
-				and (timezone.now() - gameRound.getDatetimeLastModified()).total_seconds() >= 10
+				and (timezone.now() - gameRound.getDatetimeLastModified()).total_seconds() >= SECONDS_TO_WAIT_BETWEEN_ROUNDS
 		):
 			return True
 		return False
@@ -94,7 +94,7 @@ class Game(models.Model):
 
 	def getNextGameRoundGamePlayerQuestioner(self):
 		if self.gameround_set.filter(game = self).count() > 0:
-			lastGameRound = self.gameround_set.filter(game = self).order_by("id").first()
+			lastGameRound = self.getMostRecentRound()
 			lastGamePlayerQuestioner = lastGameRound.gamePlayerQuestioner
 
 			gamePlayers = self.gameplayer_set.filter(game = self).order_by("id")
@@ -139,7 +139,8 @@ class Game(models.Model):
 		if currentRound:
 			for gamePlayer in self.gameplayer_set.filter(game = self, player = None):
 				self.gamePlayerSubmitsAnswerCard(gamePlayer, gamePlayer.getRandomAnswerCard())
-				self.gamePlayerPicksWinningAnswerCard(gamePlayer, currentRound.getRandomGameRoundAnswer().gameCard)
+				if currentRound.allAnswersHaveBeenSubmitted():
+					self.gamePlayerPicksWinningAnswerCard(gamePlayer, currentRound.getRandomGameRoundAnswer().gameCard)
 		return True
 
 class GamePlayer(models.Model):

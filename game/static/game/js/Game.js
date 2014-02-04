@@ -8,12 +8,16 @@ $(function(){
 		},
 
 		initialize: function(){
-			this.load();
-			this.listenTo(this, "addBot", this.addBot);
-			this.listenTo(this, "start", this.start);
-			this.listenTo(this, "submitAnswer", this.submitAnswer);
-			this.listenTo(this, "forceAnswers", this.forceAnswers);
-			this.listenTo(this, "chooseWinner", this.chooseWinner);
+			var self = this;
+			self.load();
+			self.listenTo(self, "addBot", self.addBot);
+			self.listenTo(self, "start", self.start);
+			self.listenTo(self, "submitAnswer", self.submitAnswer);
+			self.listenTo(self, "chooseWinner", self.chooseWinner);
+
+			setInterval(function(){
+				self.load();
+			}, 5000);
 		},
 
 		toJSON: function(){
@@ -88,14 +92,6 @@ $(function(){
 			});
 		},
 
-		forceAnswers: function(){
-			var self = this;
-			$.ajax({
-				url: "/game/" + self.get("id") + "/forceAnswers",
-				success: function(response){ self.load(); }
-			});
-		},
-
 		chooseWinner: function(data){
 			var self = this;
 			$.ajax({
@@ -116,7 +112,6 @@ $(function(){
 			"click .js-add-bot": "addBot",
 			"click .js-startgame": "startGame",
 			"click .js-answercard": "submitAnswer",
-			"click .js-forceanswers": "forceAnswers",
 			"click .js-round-answer": "chooseWinner"
 		},
 
@@ -128,8 +123,6 @@ $(function(){
 			//I really hate that I'm doing this
 			this.model.trigger("submitAnswer", {id: $(e.currentTarget).attr("data-id") });
 		},
-
-		forceAnswers: function(){ this.model.trigger("forceAnswers"); },
 
 		chooseWinner: function(e){
 			this.model.trigger("chooseWinner", {id: $(e.currentTarget).attr("data-id") });

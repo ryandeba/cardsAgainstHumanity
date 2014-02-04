@@ -58,7 +58,7 @@
 		<script type="text/template" id="template-game">
 			<div class="row">
 				<div class="col-xs-8">
-					<div class="well" style="height: 240px;">
+					<div class="well" style="min-height: 240px;">
 						<% if (active == 1) { %>
 							<h4 class="text-center"><%= currentRoundQuestioner.name %> wants to know...</h4>
 							<h2 class="text-center"><%= currentRoundQuestion %></h2>
@@ -72,7 +72,6 @@
 								<% } %>
 							</ul>
 
-							<button type="button" class="btn btn-primary js-forceanswers">Force Answers</button>
 						<% } else { %>
 							<h3 class="text-center">Waiting for other players to join</h3>
 							<% if (gamePlayers.length >= 3){ %>
@@ -82,7 +81,7 @@
 					</div>
 				</div>
 				<div class="col-xs-4">
-					<div class="well" style="height: 240px;">
+					<div class="well" style="min-height: 240px;">
 						<h4 class="text-center">Players</h4>
 						<ol class="js-gameplayers">
 							<% for (var i = 0; i < gamePlayers.length; i++){ %>
