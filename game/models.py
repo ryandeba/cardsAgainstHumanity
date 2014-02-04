@@ -80,13 +80,13 @@ class Game(models.Model):
 	def isReadyToStartNewRound(self):
 		if self.active == 0:
 			return False
-		if self.getLastRound() == None:
+		if self.getPreviousRound() == None:
 			return True
-		if self.getLastRound().isComplete():
+		if self.getPreviousRound().isComplete():
 			return True
 		return False
 
-	def getLastRound(self):
+	def getPreviousRound(self):
 		return self.gameround_set.order_by("-id").first()
 
 	def getNextGameRoundGamePlayerQuestioner(self):
