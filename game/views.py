@@ -24,7 +24,6 @@ def setPlayerName(request, name):
 def lobby(request):
 	playerhash = request.COOKIES["playerhash"]
 	player = Player.objects.get(hash = playerhash)
-
 	responseData = []
 	for game in Game.objects.filter(active = 0).order_by("-gameplayer__datetimeCreated","-id")[:50]:
 		responseData.append({
@@ -58,6 +57,8 @@ def game(request, game_id):
 	game = Game.objects.get(id = game_id)
 	player = Player.objects.get(hash = request.COOKIES["playerhash"])
 	game.addPlayer(player)
+	game.takeAllBotActions()
+	game.newRound()
 	gamePlayer = game.gameplayer_set.get(player = player)
 	return HttpResponse(json.dumps(getGameJSON(game, gamePlayer)), content_type="application/json")
 
@@ -75,15 +76,6 @@ def chooseWinner(request, game_id, card_id):
 	gameCard = game.gamecard_set.get(game = game, card_id = card_id)
 	gamePlayer = game.gameplayer_set.get(game = game, player = player)
 	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
-	return HttpResponse(status = 200)
-
-def forceAnswers(request, game_id):
-	game = Game.objects.get(id = game_id)
-
-	for gamePlayer in game.gameplayer_set.all():
-		randomGameCard = gamePlayer.gamecard_set.filter(gamePlayer = gamePlayer).order_by("?").first()
-		game.gamePlayerSubmitsAnswerCard(gamePlayer, randomGameCard)
-
 	return HttpResponse(status = 200)
 
 def getGameJSON(game, thisPlayer):
@@ -109,6 +101,7 @@ def getGameJSON(game, thisPlayer):
 				"id": gameRound.id,
 				"gamePlayerQuestioner_id": gameRound.gamePlayerQuestioner_id,
 				"question": gameRound.gameCardQuestion.card.text,
+				"isComplete": gameRound.isComplete(),
 				"answers": [
 					{
 						"text": answer.gameCard.card.text,
@@ -120,4 +113,3 @@ def getGameJSON(game, thisPlayer):
 			} for gameRound in game.gameround_set.filter(game = game).order_by("id")
 		],
 	}
-

@@ -67,6 +67,7 @@
 								<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
 									<li class="js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
 										<%= currentRoundAnswers[i].text %>
+										<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
 									</li>
 								<% } %>
 							</ul>

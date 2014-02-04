@@ -48,8 +48,9 @@ class GameMethodTests(TestCase):
 
 		cards = []
 		for i in range(10):
-			if card != None and card not in cards:
-				cards.append(game.getRandomUnassignedAnswerCard())
+			randomCard = game.getRandomUnassignedAnswerCard()
+			if randomCard != None and randomCard not in cards:
+				cards.append(randomCard)
 
 		self.assertEqual(len(cards) > 5, True)
 
@@ -255,3 +256,41 @@ class GameRoundMethodTests(TestCase):
 		gameRound = game.gameround_set.create(game = game, gameCardQuestion = gameCard, gamePlayerQuestioner = gamePlayer)
 		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 0)
 		self.assertEqual(gameRound.isComplete(), False)
+
+	def test_allAnswersHaveBeenSubmitted_returnTrue(self):
+		game = Game.objects.create()
+		gameCard = game.gamecard_set.create(game = game, card = Card.objects.create())
+		gamePlayer1 = game.gameplayer_set.create(game = game)
+		gamePlayer2 = game.gameplayer_set.create(game = game)
+		gamePlayer3 = game.gameplayer_set.create(game = game)
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = gameCard, gamePlayerQuestioner = gamePlayer1)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer2, winner = 0)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer3, winner = 0)
+		self.assertEqual(gameRound.allAnswersHaveBeenSubmitted(), True)
+
+	def test_allAnswersHaveBeenSubmitted_returnFalseIfAPlayerHasNotAnswered(self):
+		game = Game.objects.create()
+		gameCard = game.gamecard_set.create(game = game, card = Card.objects.create())
+		gamePlayer1 = game.gameplayer_set.create(game = game)
+		gamePlayer2 = game.gameplayer_set.create(game = game)
+		gamePlayer3 = game.gameplayer_set.create(game = game)
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = gameCard, gamePlayerQuestioner = gamePlayer1)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer2, winner = 0)
+		self.assertEqual(gameRound.allAnswersHaveBeenSubmitted(), False)
+
+class GamePlayerMethodTests(TestCase):
+
+	def test_getRandomAnswerCard_returnsRandomCard(self):
+		game = Game.objects.create()
+		gamePlayer = game.gameplayer_set.create()
+
+		for i in range(100):
+			game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+
+		cards = []
+		for i in range(10):
+			randomCard = gamePlayer.getRandomAnswerCard()
+			if randomCard != None and randomCard not in cards:
+				cards.append(randomCard)
+
+		self.assertEqual(len(cards) > 5, True)
