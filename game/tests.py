@@ -209,6 +209,25 @@ class GameMethodTests(TestCase):
 		self.assertEqual(gameCard.gamePlayer, None)
 		self.assertEqual(gameRound.gameroundanswer_set.all().count(), 1)
 
+	def test_gamePlayerPicksWinningAnswerCard_winnerIsSet(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = gameCard, gamePlayerQuestioner = gamePlayer)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 0)
+
+		game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
+		self.assertEqual(gameRound.gameroundanswer_set.all().first().winner, 1)
+
+	def test_gamePlayerPicksWinningAnswerCard_returnsFalseIfRoundIsComplete(self):
+		game = Game.objects.create(active = 0)
+		gamePlayer = game.gameplayer_set.create(game = game)
+		gameCard = game.gamecard_set.create(game = game, gamePlayer = gamePlayer, card = Card.objects.create())
+		gameRound = game.gameround_set.create(game = game, gameCardQuestion = gameCard, gamePlayerQuestioner = gamePlayer)
+		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameCard, gamePlayer = gamePlayer, winner = 1)
+
+		self.assertEqual(game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard), False)
+
 class GameRoundMethodTests(TestCase):
 
 	def test_isComplete_returnsTrueWhenThereIsAWinner(self):

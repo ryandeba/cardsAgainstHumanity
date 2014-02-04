@@ -86,8 +86,9 @@
 						<ol class="js-gameplayers">
 							<% for (var i = 0; i < gamePlayers.length; i++){ %>
 								<li>
-									<%= gamePlayers[i].name  %>
 									<%= gamePlayers[i].id == currentRoundQuestioner.id ? "*" : "" %>
+									<%= gamePlayers[i].name  %>
+									(<%= gamePlayers[i].points  %>)
 								</li>
 							<% } %>
 						</ol>

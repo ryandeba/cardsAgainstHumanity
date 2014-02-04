@@ -107,14 +107,23 @@ class Game(models.Model):
 
 	def gamePlayerSubmitsAnswerCard(self, gamePlayer, gameCard):
 		currentRound = self.getMostRecentRound()
-		if (currentRound 
-				and currentRound.isComplete() == False \
-				and currentRound.gamePlayerQuestioner.id != gamePlayer.id \
+		if (currentRound
+				and currentRound.isComplete() == False
+				and currentRound.gamePlayerQuestioner.id != gamePlayer.id
 				and currentRound.gameroundanswer_set.filter(gameRound = currentRound, gamePlayer = gamePlayer).count() == 0
 		):
 			gameCard.gamePlayer = None
 			gameCard.save()
 			currentRound.gameroundanswer_set.create(gameRound = currentRound, gameCard = gameCard, gamePlayer = gamePlayer)
+			return True
+		return False
+
+	def gamePlayerPicksWinningAnswerCard(self, gamePlayer, gameCard):
+		gameRound = self.getMostRecentRound()
+		if gameRound.isComplete() == False:
+			gameRoundAnswer = gameRound.gameroundanswer_set.get(gameRound = gameRound, gameCard = gameCard)
+			gameRoundAnswer.winner = 1
+			gameRoundAnswer.save()
 			return True
 		return False
 
