@@ -35,13 +35,25 @@ class Game(models.Model):
 		else:
 			return 0
 
-	def startGame(self):
-		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2)])
+	def addPlayer(self, player = None):
+		if self.active == 0:
+			if player:
+				self.gameplayer_set.get_or_create(game = self, player = player)
+			else:
+				self.gameplayer_set.create(game = self)
+		return
 
-		self.dealAnswerCards()
-		self.active = 1
-		self.newRound()
-		self.save()
+	def startGame(self):
+		if self.isReadyToStart():
+			self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2)])
+			self.dealAnswerCards()
+			self.active = 1
+			self.newRound()
+			self.save()
+		return
+
+	def isReadyToStart(self):
+		return self.active == 0 and self.getNumberOfPlayers() > 2
 
 	def dealAnswerCards(self):
 		for gamePlayer in self.gameplayer_set.filter(game = self):
@@ -57,11 +69,25 @@ class Game(models.Model):
 		return self.gamecard_set.filter(game = self, card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
 
 	def newRound(self):
-		self.gameround_set.create(
-			game = self,
-			gameCardQuestion = self.getRandomUnusedQuestionCard(),
-			gamePlayerQuestioner = self.getNextGameRoundGamePlayerQuestioner()
-		)
+		if self.isReadyToStartNewRound():
+			self.gameround_set.create(
+				game = self,
+				gameCardQuestion = self.getRandomUnusedQuestionCard(),
+				gamePlayerQuestioner = self.getNextGameRoundGamePlayerQuestioner()
+			)
+		return
+		
+	def isReadyToStartNewRound(self):
+		if self.active == 0:
+			return False
+		if self.getLastRound() == None:
+			return True
+		if self.getLastRound().isComplete():
+			return True
+		return False
+
+	def getLastRound(self):
+		return self.gameround_set.order_by("-id").first()
 
 	def getNextGameRoundGamePlayerQuestioner(self):
 		if self.gameround_set.filter(game = self).count() > 0:
@@ -104,6 +130,9 @@ class GameRound(models.Model):
 	gameCardQuestion = models.ForeignKey(GameCard)
 	gamePlayerQuestioner = models.ForeignKey(GamePlayer)
 	datetimeCreated = models.DateTimeField(auto_now = True)
+
+	def isComplete(self):
+		return self.gameroundanswer_set.filter(gameRound = self, winner = 1).count() > 0
 
 class GameRoundAnswer(models.Model):
 	gameRound = models.ForeignKey(GameRound)

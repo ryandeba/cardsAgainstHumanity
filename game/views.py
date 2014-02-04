@@ -44,17 +44,14 @@ def addBot(request, game_id):
 	return HttpResponse(status = 200)
 
 def startGame(request, game_id):
-	game = Game.objects.get(id = game_id)
-	if game.active == 0 and game.getNumberOfPlayers() > 2:
-		game.startGame()
+	Game.objects.get(id = game_id).startGame()
 	return HttpResponse(status = 200)
 
 def game(request, game_id):
 	game = Game.objects.get(id = game_id)
 
-	if game.active == 0:
-		player = Player.objects.get(hash = request.COOKIES["playerhash"])
-		game.gameplayer_set.get_or_create(game = game, player = player)
+	player = Player.objects.get(hash = request.COOKIES["playerhash"])
+	game.addPlayer(player)
 
 	return HttpResponse(json.dumps(getGameJSON(game)), content_type="application/json")
 
