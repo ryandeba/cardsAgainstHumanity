@@ -72,11 +72,15 @@
 								<% } %>
 							</ul>
 
-						<% } else { %>
+						<% } else if (active == 0) { %>
 							<h3 class="text-center">Waiting for other players to join</h3>
 							<% if (gamePlayers.length >= 3){ %>
 								<button type="button" class="btn btn-primary js-startgame">Start Game</button>
 							<% } %>
+						<% } else if (active == 2) { %>
+							<h3 class="text-center">Game Over</h3>
+						<% } else { %>
+							<h3 class="text-center">Loading...</h3>
 						<% } %>
 					</div>
 				</div>
@@ -100,12 +104,14 @@
 			</div>
 
 			<div class="row">
-				<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
-					<div class="col-xs-2">
-						<div class="well card js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>" style="height: 200px;">
-							<%= thisPlayersAnswerCards[i].text %>
+				<% if (active == 0){ %>
+					<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
+						<div class="col-xs-2">
+							<div class="well card js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>" style="height: 200px;">
+								<%= thisPlayersAnswerCards[i].text %>
+							</div>
 						</div>
-					</div>
+					<% } %>
 				<% } %>
 			</div>
 		</script>

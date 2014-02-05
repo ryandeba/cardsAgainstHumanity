@@ -2,7 +2,7 @@ $(function(){
 
 	cardsAgainstHumanity.Game = Backbone.Model.extend({
 		defaults: {
-			active: 0,
+			active: undefined,
 			gamePlayers: [],
 			gameRounds: []
 		},
