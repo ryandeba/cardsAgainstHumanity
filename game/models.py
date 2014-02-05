@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils import timezone
 
-SECONDS_TO_WAIT_BETWEEN_ROUNDS = 20
+SECONDS_TO_WAIT_BETWEEN_ROUNDS = 10
+MAXIMUM_NUMBER_OF_PLAYERS = 6
+NUMBER_OF_POINTS_NEEDED_TO_WIN = 10
 
 class Card(models.Model):
 	cardType = models.CharField(max_length = 1)
@@ -20,7 +22,7 @@ class Player(models.Model):
 		return self.name
 
 class Game(models.Model):
-	active = models.IntegerField(default = 0) #0 - lobby, 1 - active
+	active = models.IntegerField(default = 0) #0 - lobby, 1 - active, 2 - finished #TODO: rename this column to status or something
 
 	def __unicode__(self):
 		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
@@ -36,12 +38,27 @@ class Game(models.Model):
 			return 0
 
 	def addPlayer(self, player = None):
-		if self.active == 0:
+		if self.canAddAnotherPlayer():
 			if player:
 				self.gameplayer_set.get_or_create(game = self, player = player)
 			else:
 				self.gameplayer_set.create(game = self)
 		return
+
+	def canAddAnotherPlayer(self):
+		return self.active == 0 and self.getNumberOfPlayers() < MAXIMUM_NUMBER_OF_PLAYERS
+
+	def applyAllAvailableGameActions(self):
+		self.finishGame()
+		self.takeAllBotActions()
+		self.newRound()
+
+	def finishGame(self):
+		for gamePlayer in self.gameplayer_set.all():
+			if gamePlayer.getPoints() >= NUMBER_OF_POINTS_NEEDED_TO_WIN:
+				self.active = 2
+				self.save()
+				return
 
 	def startGame(self):
 		if self.isReadyToStart():
@@ -76,9 +93,9 @@ class Game(models.Model):
 			)
 			self.dealAnswerCards()
 		return
-		
+
 	def isReadyToStartNewRound(self):
-		if self.active == 0:
+		if self.active != 1:
 			return False
 		gameRound = self.getMostRecentRound()
 		if gameRound == None:

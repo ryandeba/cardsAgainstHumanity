@@ -57,8 +57,7 @@ def game(request, game_id):
 	game = Game.objects.get(id = game_id)
 	player = Player.objects.get(hash = request.COOKIES["playerhash"])
 	game.addPlayer(player)
-	game.takeAllBotActions()
-	game.newRound()
+	game.applyAllAvailableGameActions()
 	gamePlayer = game.gameplayer_set.get(player = player)
 	return HttpResponse(json.dumps(getGameJSON(game, gamePlayer)), content_type="application/json")
 
