@@ -25,6 +25,7 @@ $(function(){
 				currentRoundQuestioner: this.getCurrentRoundQuestioner(),
 				currentRoundQuestion: this.getCurrentRoundQuestion(),
 				currentRoundAnswers: this.getCurrentRoundAnswers(),
+				currentRoundWinner: this.getCurrentRoundWinner(),
 				thisPlayersAnswerCards: this.getThisPlayersAnswerCards()
 			});
 		},
@@ -46,6 +47,16 @@ $(function(){
 			if (this.get("gameRounds").length == 0)
 				return [];
 			return _.last(this.get("gameRounds")).answers
+		},
+
+		getCurrentRoundWinner: function(){
+			if (this.get("gameRounds").length == 0)
+				return undefined;
+			var lastRound = _.last(this.get("gameRounds"));
+			var winningAnswer = _.findWhere(lastRound.answers, {winner: 1});
+			if (winningAnswer == undefined)
+				return undefined
+			return _.findWhere(this.get("gamePlayers"), {id: winningAnswer.gameplayer_id});
 		},
 
 		getThisPlayersAnswerCards: function(){

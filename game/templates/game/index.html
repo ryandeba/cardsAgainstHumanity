@@ -60,17 +60,27 @@
 				<div class="col-xs-8">
 					<div class="well" style="min-height: 240px;">
 						<% if (active == 1) { %>
-							<h4 class="text-center"><%= currentRoundQuestioner.name %> wants to know...</h4>
+							<h4 class="text-center">
+								<% if (currentRoundWinner != undefined){ %>
+									<%= currentRoundWinner.name %> wins! Next round will start soon.
+								<% } else { %>
+									<%= currentRoundQuestioner.name %> wants to know...
+								<% } %>
+							</h4>
 							<h2 class="text-center"><%= currentRoundQuestion %></h2>
 
-							<ul>
-								<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
-									<li class="js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
-										<%= currentRoundAnswers[i].text %>
-										<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
-									</li>
-								<% } %>
-							</ul>
+							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
+								<ul>
+									<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
+										<li class="js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
+											<%= currentRoundAnswers[i].text %>
+											<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
+										</li>
+									<% } %>
+								</ul>
+							<% } else { %>
+								<p>Waiting for all players to submit answers</p>
+							<% } %>
 
 						<% } else if (active == 0) { %>
 							<h3 class="text-center">Waiting for other players to join</h3>
@@ -184,6 +194,15 @@
 							</p>
 							<p>
 								Source code available at <a href="https://github.com/ryandeba/cardsAgainstHumanity" target="_blank">https://github.com/ryandeba/cardsAgainstHumanity</a>.
+							</p>
+							<p>
+								Upcoming features in no particular order:
+								<ul>
+									<li>Support for questions with more than one answer</li>
+									<li>Pick which expansions to include</li>
+									<li>Create your own cards</li>
+									<li>Mobile friendly</li>
+								</ul>
 							</p>
 						</div>
 					</div>
