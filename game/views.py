@@ -91,9 +91,9 @@ def getGameJSON(game, thisPlayer):
 					{
 						"card_id": gameCard.card.id,
 						"text": gameCard.card.text
-					} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = gamePlayer).filter(gamePlayer = thisPlayer).order_by("id")
+					} for gameCard in game.gamecard_set.all().filter(gamePlayer = gamePlayer).filter(gamePlayer = thisPlayer).order_by("id")
 				],
-			} for gamePlayer in game.gameplayer_set.filter(game = game).order_by("id")
+			} for gamePlayer in game.gameplayer_set.all().order_by("id")
 		],
 		"gameRounds": [
 			{
@@ -109,6 +109,6 @@ def getGameJSON(game, thisPlayer):
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all()
 				],
-			} for gameRound in game.gameround_set.filter(game = game).order_by("id")
+			} for gameRound in game.gameround_set.all().order_by("id")
 		],
 	}

@@ -28,10 +28,10 @@ class Game(models.Model):
 		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
 
 	def getNumberOfPlayers(self):
-		return self.gameplayer_set.filter(game = self).count()
+		return self.gameplayer_set.all().count()
 
 	def getSecondsSinceLastPlayerJoined(self):
-		lastPlayerToJoin = self.gameplayer_set.filter(game = self).order_by("-id").first()
+		lastPlayerToJoin = self.gameplayer_set.all().order_by("-id").first()
 		if lastPlayerToJoin:
 			return (timezone.now() - lastPlayerToJoin.datetimeCreated).total_seconds()
 		else:
@@ -72,17 +72,17 @@ class Game(models.Model):
 		return self.active == 0 and self.getNumberOfPlayers() > 2
 
 	def dealAnswerCards(self):
-		for gamePlayer in self.gameplayer_set.filter(game = self):
-			while len(self.gamecard_set.filter(game = self, gamePlayer = gamePlayer)) < 10:
+		for gamePlayer in self.gameplayer_set.all():
+			while len(self.gamecard_set.all().filter(gamePlayer = gamePlayer)) < 10:
 				gameCard = self.getRandomUnassignedAnswerCard()
 				gameCard.gamePlayer = gamePlayer
 				gameCard.save()
 
 	def getRandomUnassignedAnswerCard(self):
-		return self.gamecard_set.filter(game = self, card__cardType = "A", gamePlayer_id = None).order_by("?").first()
+		return self.gamecard_set.all().filter(card__cardType = "A", gamePlayer_id = None).order_by("?").first()
 
 	def getRandomUnusedQuestionCard(self):
-		return self.gamecard_set.filter(game = self, card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
+		return self.gamecard_set.all().filter(card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
 
 	def newRound(self):
 		if self.isReadyToStartNewRound():
@@ -110,11 +110,11 @@ class Game(models.Model):
 		return self.gameround_set.order_by("-id").first()
 
 	def getNextGameRoundGamePlayerQuestioner(self):
-		if self.gameround_set.filter(game = self).count() > 0:
+		if self.gameround_set.all().count() > 0:
 			lastGameRound = self.getMostRecentRound()
 			lastGamePlayerQuestioner = lastGameRound.gamePlayerQuestioner
 
-			gamePlayers = self.gameplayer_set.filter(game = self).order_by("id")
+			gamePlayers = self.gameplayer_set.all().order_by("id")
 			foundTheLastPlayer = False
 			for gamePlayer in gamePlayers:
 				if foundTheLastPlayer:
@@ -123,14 +123,14 @@ class Game(models.Model):
 					foundTheLastPlayer = True
 			return gamePlayers[0]
 		else:
-			return self.gameplayer_set.filter(game = self).order_by("?").first()
+			return self.gameplayer_set.all().order_by("?").first()
 
 	def gamePlayerSubmitsAnswerCard(self, gamePlayer, gameCard):
 		currentRound = self.getMostRecentRound()
 		if (currentRound
 				and currentRound.isComplete() == False
 				and currentRound.gamePlayerQuestioner.id != gamePlayer.id
-				and currentRound.gameroundanswer_set.filter(gameRound = currentRound, gamePlayer = gamePlayer).count() == 0
+				and currentRound.gameroundanswer_set.all().filter(gamePlayer = gamePlayer).count() == 0
 		):
 			gameCard.gamePlayer = None
 			gameCard.save()
@@ -154,7 +154,7 @@ class Game(models.Model):
 	def takeAllBotActions(self):
 		currentRound = self.getMostRecentRound()
 		if currentRound:
-			for gamePlayer in self.gameplayer_set.filter(game = self, player = None):
+			for gamePlayer in self.gameplayer_set.all().filter(player = None):
 				self.gamePlayerSubmitsAnswerCard(gamePlayer, gamePlayer.getRandomAnswerCard())
 				if currentRound.allAnswersHaveBeenSubmitted():
 					self.gamePlayerPicksWinningAnswerCard(gamePlayer, currentRound.getRandomGameRoundAnswer().gameCard)
@@ -176,7 +176,7 @@ class GamePlayer(models.Model):
 		return "Anonymous"
 
 	def getPoints(self):
-		return self.gameroundanswer_set.filter(gamePlayer = self, winner = 1).count()
+		return self.gameroundanswer_set.all().filter(winner = 1).count()
 
 	def getRandomAnswerCard(self):
 		return self.gamecard_set.all().order_by("?").first()
@@ -192,11 +192,11 @@ class GameRound(models.Model):
 	gamePlayerQuestioner = models.ForeignKey(GamePlayer)
 
 	def isComplete(self):
-		return self.gameroundanswer_set.filter(gameRound = self, winner = 1).count() > 0
+		return self.gameroundanswer_set.all().filter(winner = 1).count() > 0
 
 	def allAnswersHaveBeenSubmitted(self):
 		for gamePlayer in self.game.gameplayer_set.all().exclude(id = self.gamePlayerQuestioner_id):
-			if self.gameroundanswer_set.filter(gameRound = self, gamePlayer = gamePlayer).count() == 0:
+			if self.gameroundanswer_set.all().filter(gamePlayer = gamePlayer).count() == 0:
 				return False
 		return True
 
