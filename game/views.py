@@ -63,7 +63,8 @@ def game(request, game_id):
 	responseData = getGameJSON(
 		game = game,
 		thisPlayer = gamePlayer,
-		gameRoundIDsToExclude = request.GET.get("gr_id", "")
+		gameRoundIDsToExclude = request.GET.get("gr_id", ""),
+		gameCardIDsToExclude = request.GET.get("tpac_id", "")
 	)
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
@@ -83,7 +84,7 @@ def chooseWinner(request, game_id, card_id):
 	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
 	return HttpResponse(status = 200)
 
-def getGameJSON(game, thisPlayer, gameRoundIDsToExclude):
+def getGameJSON(game, thisPlayer, gameRoundIDsToExclude, gameCardIDsToExclude):
 	return {
 		"id": game.id,
 		"active": game.active,
@@ -91,7 +92,7 @@ def getGameJSON(game, thisPlayer, gameRoundIDsToExclude):
 			{
 				"card_id": gameCard.card.id,
 				"text": gameCard.card.text
-			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer).exclude(gamePlayer_id = None)
+			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer).exclude(gamePlayer_id = None) if str(gameCard.card_id) not in gameCardIDsToExclude.split(",")
 		],
 		"gamePlayers": [
 			{
@@ -115,6 +116,6 @@ def getGameJSON(game, thisPlayer, gameRoundIDsToExclude):
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all()
 				],
-			} for gameRound in game.gameround_set.all().order_by("id") if str(gameRound.id) not in str(gameRoundIDsToExclude).split(",")
+			} for gameRound in game.gameround_set.all().order_by("id") if str(gameRound.id) not in gameRoundIDsToExclude.split(",")
 		],
 	}

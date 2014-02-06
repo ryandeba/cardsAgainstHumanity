@@ -4,7 +4,8 @@ $(function(){
 		defaults: {
 			active: undefined,
 			gamePlayers: [],
-			gameRounds: []
+			gameRounds: [],
+			thisPlayersAnswerCards: []
 		},
 
 		initialize: function(){
@@ -73,10 +74,18 @@ $(function(){
 			return result;
 		},
 
+		getThisPlayerAnswerCardsIDList: function(){
+			var result = "";
+			_.each(this.get("thisPlayersAnswerCards"), function(answerCard){
+				result += answerCard.card_id + ",";
+			});
+			return result;
+		},
+
 		load: function(){
 			var self = this;
 			$.ajax({
-				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList(),
+				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList() + "&tpac_id=" + self.getThisPlayerAnswerCardsIDList(),
 				success: function(response){
 					self.loadSuccess(response);
 				}
@@ -84,6 +93,7 @@ $(function(){
 		},
 
 		loadSuccess: function(response){
+			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards);
 			response.gameRounds = this.get("gameRounds").concat(response.gameRounds);
 			this.set(response);
 			this.trigger("change");
