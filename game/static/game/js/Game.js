@@ -117,6 +117,9 @@ $(function(){
 
 		submitAnswer: function(data){
 			var self = this;
+			self.set("thisPlayersAnswerCards", _.without(self.get("thisPlayersAnswerCards"),
+				_.findWhere(self.get("thisPlayersAnswerCards"), {card_id: parseInt(data.id)})
+			));
 			$.ajax({
 				url: "/game/" + self.get("id") + "/submitAnswer/" + data.id,
 				success: function(response){ self.load(); }
