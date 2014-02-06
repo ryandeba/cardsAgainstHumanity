@@ -62,7 +62,7 @@ class Game(models.Model):
 
 	def startGame(self):
 		if self.isReadyToStart():
-			self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2)])
+			self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.exclude(numberOfAnswers = 2).exclude(numberOfAnswers = 3)])
 			self.active = 1
 			self.newRound()
 			self.save()
