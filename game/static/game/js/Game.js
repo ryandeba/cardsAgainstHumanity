@@ -163,11 +163,4 @@ $(function(){
 		}
 	});
 
-	var GameRound = Backbone.Model.extend({
-	});
-
-	var GameRounds = Backbone.Collection.extend({
-		model: GameRound
-	});
-
 });

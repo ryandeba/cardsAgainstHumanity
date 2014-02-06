@@ -70,14 +70,12 @@
 							<h2 class="text-center"><%= currentRoundQuestion %></h2>
 
 							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
-								<ul>
-									<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
-										<li class="js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
-											<%= currentRoundAnswers[i].text %>
-											<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
-										</li>
-									<% } %>
-								</ul>
+								<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
+									<button class="btn btn-primary js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
+										<%= currentRoundAnswers[i].text %>
+										<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
+									</button>
+								<% } %>
 							<% } else { %>
 								<p>Waiting for all players to submit answers</p>
 							<% } %>
