@@ -60,14 +60,23 @@ $(function(){
 		},
 
 		getThisPlayersAnswerCards: function(){
+			return this.get("thisPlayersAnswerCards");
 			var thisGamePlayer = _.findWhere(this.get("gamePlayers"), {hash: cardsAgainstHumanity.playerhash});
 			return thisGamePlayer != undefined ? thisGamePlayer.gameCards : [];
+		},
+
+		getCompletedGameRoundIDList: function(){
+			var result = "";
+			_.each( _.where(this.get("gameRounds"), {isComplete: true}), function(gameRound){
+				result += gameRound.id + ",";
+			});
+			return result;
 		},
 
 		load: function(){
 			var self = this;
 			$.ajax({
-				url: "/game/" + self.get("id"),
+				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList(),
 				success: function(response){
 					self.loadSuccess(response);
 				}
@@ -75,6 +84,7 @@ $(function(){
 		},
 
 		loadSuccess: function(response){
+			response.gameRounds = this.get("gameRounds").concat(response.gameRounds);
 			this.set(response);
 			this.trigger("change");
 		},

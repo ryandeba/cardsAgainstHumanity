@@ -58,8 +58,14 @@ def game(request, game_id):
 	player = Player.objects.get(hash = request.COOKIES["playerhash"])
 	game.addPlayer(player)
 	game.applyAllAvailableGameActions()
-	gamePlayer = game.gameplayer_set.get(player = player)
-	return HttpResponse(json.dumps(getGameJSON(game, gamePlayer)), content_type="application/json")
+	gamePlayer = game.gameplayer_set.all().filter(player = player).first()
+
+	responseData = getGameJSON(
+		game = game,
+		thisPlayer = gamePlayer,
+		gameRoundIDsToExclude = request.GET.get("gr_id", "")
+	)
+	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
 def submitAnswer(request, game_id, card_id):
 	player = Player.objects.get(hash = request.COOKIES["playerhash"])
@@ -77,22 +83,22 @@ def chooseWinner(request, game_id, card_id):
 	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
 	return HttpResponse(status = 200)
 
-def getGameJSON(game, thisPlayer):
+def getGameJSON(game, thisPlayer, gameRoundIDsToExclude):
 	return {
 		"id": game.id,
 		"active": game.active,
+		"thisPlayersAnswerCards": [
+			{
+				"card_id": gameCard.card.id,
+				"text": gameCard.card.text
+			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer).exclude(gamePlayer_id = None)
+		],
 		"gamePlayers": [
 			{
 				"id": gamePlayer.id,
 				"hash": gamePlayer.getHash(),
 				"name": gamePlayer.getName(),
 				"points": gamePlayer.getPoints(),
-				"gameCards": [
-					{
-						"card_id": gameCard.card.id,
-						"text": gameCard.card.text
-					} for gameCard in game.gamecard_set.all().filter(gamePlayer = gamePlayer).filter(gamePlayer = thisPlayer).order_by("id")
-				],
 			} for gamePlayer in game.gameplayer_set.all().order_by("id")
 		],
 		"gameRounds": [
@@ -109,6 +115,6 @@ def getGameJSON(game, thisPlayer):
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all()
 				],
-			} for gameRound in game.gameround_set.all().order_by("id")
+			} for gameRound in game.gameround_set.all().order_by("id") if str(gameRound.id) not in str(gameRoundIDsToExclude).split(",")
 		],
 	}
