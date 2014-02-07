@@ -19,5 +19,5 @@ urlpatterns = patterns('',
 	url(r'^setPlayerName/(?P<name>\w+)', views.setPlayerName),
 	url(r'^newGame', views.newGame),
 	url(r'^lobby', views.lobby),
-	url(r'^.*$', views.index),
+	url(r'^$', views.index),
 )
