@@ -37,7 +37,7 @@ class GameMethodTests(TestCase):
 		gameCards = game.gamecard_set.all()
 		self.assertEqual(len(gameCards), 200)
 
-	def test_getRandomUnassignedAnswerCard_returnsRandomCard(self):
+	def test_getRandomUnusedAnswerCard_returnsRandomCard(self):
 		game = Game.objects.create()
 
 		for i in range(100):
@@ -48,13 +48,13 @@ class GameMethodTests(TestCase):
 
 		cards = []
 		for i in range(10):
-			randomCard = game.getRandomUnassignedAnswerCard()
+			randomCard = game.getRandomUnusedAnswerCard()
 			if randomCard != None and randomCard not in cards:
 				cards.append(randomCard)
 
 		self.assertEqual(len(cards) > 5, True)
 
-	def test_getRandomUnassignedAnswerCard_doesNotReturnAssignedCards(self):
+	def test_getRandomUnusedAnswerCard_doesNotReturnAssignedCards(self):
 		game = Game.objects.create()
 		player = Player()
 		gamePlayer = GamePlayer.objects.create(game = game, player = player)
@@ -63,7 +63,7 @@ class GameMethodTests(TestCase):
 		game.gamecard_set.create(game = game, card = card1, gamePlayer = gamePlayer)
 		game.gamecard_set.create(game = game, card = card2)
 
-		randomCard = game.getRandomUnassignedAnswerCard()
+		randomCard = game.getRandomUnusedAnswerCard()
 
 		self.assertEqual(randomCard.id, card2.id)
 
@@ -154,7 +154,6 @@ class GameMethodTests(TestCase):
 		self.assertEqual(game.isReadyToStartNewRound(), False)
 
 	def test_isReadyToStartNewRound_returnsFalseIfActiveAndPriorRoundIsNotComplete(self):
-		#TODO: there's got to be a way to mock some of this stuff
 		game = Game.objects.create(active = 0)
 		gameCard = game.gamecard_set.create(game = game, card = Card.objects.create())
 		gamePlayer = game.gameplayer_set.create(game = game)

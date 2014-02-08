@@ -76,15 +76,15 @@ class Game(models.Model):
 	def dealAnswerCards(self):
 		for gamePlayer in self.gameplayer_set.all():
 			while len(self.gamecard_set.all().filter(gamePlayer = gamePlayer)) < 10:
-				gameCard = self.getRandomUnassignedAnswerCard()
+				gameCard = self.getRandomUnusedAnswerCard()
 				gameCard.gamePlayer = gamePlayer
 				gameCard.save()
 
-	def getRandomUnassignedAnswerCard(self):
-		return self.gamecard_set.all().filter(card__cardType = "A", gamePlayer_id = None).order_by("?").first()
+	def getRandomUnusedAnswerCard(self):
+		return self.gamecard_set.all().filter(card__cardType = "A", gamePlayer = None, gameroundanswer = None).order_by("?").first()
 
 	def getRandomUnusedQuestionCard(self):
-		return self.gamecard_set.all().filter(card__cardType = "Q", gamePlayer_id = None).order_by("?").first()
+		return self.gamecard_set.all().filter(card__cardType = "Q", gamePlayer = None, gameround = None).order_by("?").first()
 
 	def newRound(self):
 		if self.isReadyToStartNewRound():
