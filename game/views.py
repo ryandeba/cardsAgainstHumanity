@@ -7,11 +7,10 @@ import random, json
 
 def index(request):
 	playerhash = "%032x" % random.getrandbits(128)
-	name = ""
 	if request.COOKIES.has_key("playerhash"):
 		playerhash = request.COOKIES["playerhash"]
-		player, created = Player.objects.get_or_create(hash = playerhash)
-		name = player.name
+	player, created = Player.objects.get_or_create(hash = playerhash)
+	name = player.name
 	return render(request, 'game/index.html', {'playerhash': playerhash, 'playername': name})
 
 def setPlayerName(request, name):
