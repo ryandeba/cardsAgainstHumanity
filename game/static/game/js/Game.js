@@ -15,6 +15,7 @@ $(function(){
 			self.listenTo(self, "start", self.start);
 			self.listenTo(self, "submitAnswer", self.submitAnswer);
 			self.listenTo(self, "chooseWinner", self.chooseWinner);
+			self.listenTo(self, "change:id", self.load);
 
 			setInterval(function(){
 				self.load();
@@ -84,6 +85,9 @@ $(function(){
 
 		load: function(){
 			var self = this;
+			if (self.get("id") == undefined){
+				return;
+			}
 			$.ajax({
 				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList() + "&tpac_id=" + self.getThisPlayerAnswerCardsIDList(),
 				success: function(response){

@@ -1,5 +1,7 @@
 $(function(){
 
+	var game;
+
 	cardsAgainstHumanity = new Backbone.Marionette.Application();
 
 	cardsAgainstHumanity.addRegions({
@@ -9,6 +11,7 @@ $(function(){
 	cardsAgainstHumanity.on("initialize:after", function(options){
 		storePlayerHash(options.playerhash);
 		initUser($("#username").val());
+		game = new cardsAgainstHumanity.Game();
 
 		this.listenTo(this.vent, "lobby:newGame", newGame);
 		this.listenTo(this.vent, "showGame", showGame);
@@ -43,7 +46,7 @@ $(function(){
 	};
 
 	var showGame = function(id){
-		var game = new cardsAgainstHumanity.Game({id: id});
+		game.set("id", id);
 		var gameView = new cardsAgainstHumanity.GameView({
 			model: game
 		});
