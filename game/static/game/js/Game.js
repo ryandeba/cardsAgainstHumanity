@@ -146,6 +146,10 @@ $(function(){
 			this.listenTo(this.model, "change", this.render);
 		},
 
+		onClose: function(){
+			this.model.set("id", undefined);
+		},
+
 		events: {
 			"click .js-add-bot": "addBot",
 			"click .js-startgame": "startGame",

@@ -22,9 +22,9 @@ $(function(){
 		render: function(){
 			var $submit = this.$el.find(".js-username-submit");
 			if (this.model.get("localUsername") == this.model.get("serverUsername")){
-				$submit.removeClass("btn-primary fadeIn").addClass("btn-success fadeIn").html("Saved");
+				$submit.removeClass("btn-primary").addClass("btn-success").html("Saved");
 			} else {
-				$submit.addClass("btn-primary").removeClass("btn-success fadeIn").html("Save");
+				$submit.addClass("btn-primary").removeClass("btn-success").html("Save");
 			}
 		},
 

@@ -8,6 +8,7 @@ $(function(){
 			"game/:id": "game",
 			"about": "about",
 			"lobby": "lobby",
+			"newgame": "newgame",
 			"": "lobby"
 		},
 
@@ -25,6 +26,10 @@ $(function(){
 
 		lobby: function(){
 			cardsAgainstHumanity.vent.trigger("showLobby");
+		},
+
+		newgame: function(){
+			cardsAgainstHumanity.vent.trigger("showGameSetup");
 		}
 	});
 	new Router();

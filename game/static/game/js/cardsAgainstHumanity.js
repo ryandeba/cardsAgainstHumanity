@@ -13,14 +13,15 @@ $(function(){
 		initUser($("#username").val());
 		game = new cardsAgainstHumanity.Game();
 
-		this.listenTo(this.vent, "lobby:newGame", newGame);
+		this.listenTo(this.vent, "createGame", createGame);
+		this.listenTo(this.vent, "showGameSetup", showGameSetup);
 		this.listenTo(this.vent, "showGame", showGame);
 		this.listenTo(this.vent, "showAbout", showAbout);
 		this.listenTo(this.vent, "showLobby", showLobby);
 		Backbone.history.start();
 	});
 
-	var newGame = function(){
+	var createGame = function(data){
 		$.ajax({
 			url: "/newGame",
 			success: function(response){ cardsAgainstHumanity.vent.trigger("navigate", "game/" + response.id); }
@@ -43,6 +44,11 @@ $(function(){
 			collection: lobbyGames
 		});
 		cardsAgainstHumanity.main.show(lobbyView);
+	};
+
+	var showGameSetup = function(){
+		var gameSetupView = new cardsAgainstHumanity.GameSetupView();
+		cardsAgainstHumanity.main.show(gameSetupView);
 	};
 
 	var showGame = function(id){

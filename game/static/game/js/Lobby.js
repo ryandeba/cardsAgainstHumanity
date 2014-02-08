@@ -52,7 +52,7 @@ $(function(){
 		},
 
 		newGame: function(){
-			cardsAgainstHumanity.vent.trigger("lobby:newGame");
+			cardsAgainstHumanity.vent.trigger("lobby:setupNewGame");
 		},
 
 		setUsername: function(e){
