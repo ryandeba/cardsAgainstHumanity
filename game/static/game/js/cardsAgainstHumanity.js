@@ -7,7 +7,8 @@ $(function(){
 	});
 
 	cardsAgainstHumanity.on("initialize:after", function(options){
-		storePlayerHash();
+		storePlayerHash(options.playerhash);
+		initUser($("#username").val());
 
 		this.listenTo(this.vent, "lobby:newGame", newGame);
 		this.listenTo(this.vent, "showGame", showGame);
@@ -23,8 +24,7 @@ $(function(){
 		});
 	};
 
-	var storePlayerHash = function(){
-		var playerhash = $("#playerhash").val();
+	var storePlayerHash = function(playerhash){
 		$.cookie("playerhash", playerhash, {path: "/"});
 		cardsAgainstHumanity.playerhash = playerhash;
 	};
@@ -48,6 +48,17 @@ $(function(){
 			model: game
 		});
 		cardsAgainstHumanity.main.show(gameView);
+	};
+
+	var initUser = function(username){
+		var user = new cardsAgainstHumanity.User({
+			localUsername: username,
+			serverUsername: username
+		});
+		var userView = new cardsAgainstHumanity.UserView({
+			model: user,
+			el: "#form-username"
+		}).render();
 	};
 
 });

@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Cards Against Humanity</title>
 
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/bootstrap.min.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'game/css/animate.css' %}" />
 		<style>
-			body {
-				padding-top: 80px;
-			}
-
 			.card:hover {
 				box-shadow: 0px 0px 15px #fff;
 				cursor: pointer;
@@ -21,34 +21,45 @@
 		<script src="{% static 'game/js/vendor/underscore.js' %}"></script>
 		<script src="{% static 'game/js/vendor/backbone.js' %}"></script>
 		<script src="{% static 'game/js/vendor/backbone.marionette.js' %}"></script>
+		<script src="{% static 'game/js/vendor/bootstrap.js' %}"></script>
 
 		<script src="{% static 'game/js/cardsAgainstHumanity.js' %}"></script>
-		<script src="{% static 'game/js/AboutView.js' %}"></script>
+		<script src="{% static 'game/js/User.js' %}"></script>
+		<script src="{% static 'game/js/About.js' %}"></script>
 		<script src="{% static 'game/js/Lobby.js' %}"></script>
 		<script src="{% static 'game/js/Game.js' %}"></script>
 		<script src="{% static 'game/js/Router.js' %}"></script>
 
 		<script>
 			$(function(){
-				cardsAgainstHumanity.start();
+				cardsAgainstHumanity.start({playerhash: '{{ playerhash }}'});
 			});
 		</script>
 	</head>
 	<body>
-		<input type="hidden" id="playerhash" name="playerhash" value="{{ playerhash }}" />
-		<header class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container">
+		<header class="navbar navbar-default">
+			<div class="container-fluid">
 				<div class="navbar-header">
-					<a href="./" class="navbar-brand">Cards against humanity</a>
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-collapse">
+						<span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+					</button>
+					<a href="/" class="navbar-brand">Cards Against Humanity</a>
 				</div>
 
-				<nav>
+				<div class="collapse navbar-collapse" id="header-collapse">
 					<ul class="nav navbar-nav">
 						<li><a href="#lobby">Lobby</a></li>
 						<li><a href="#about">About</a></li>
 					</ul>
-				</nav>
 
+					<form id="form-username" class="navbar-form navbar-right">
+						<div class="form-group">
+							<input type="text" class="form-control" name="username" id="username" placeholder="Username" value="{{ playername }}" />
+						</div>
+						<button type="submit" class="btn btn-success js-username-submit animated">Saved</button>
+					</form>
+
+				</div>
 			</div>
 		</header>
 
@@ -130,49 +141,31 @@
 
 		<script type="text/template" id="template-lobby">
 			<div class="row">
-				<div class="col-xs-8 col-xs-offset-2">
-					<div class="form-horizontal js-login-form">
-					</div>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-8 col-xs-offset-2">
-					<div class="panel panel-default">
-						<div class="panel-heading">Lobby</div>
-						<div class="panel-body">
-
-							<form class="js-username-form">
-								<p class="input-group">
-									<input type="text" class="form-control" name="username" id="username" placeholder="Username" value="{{ playername }}" />
-									<span class="input-group-btn"><button type="submit" class="btn btn-primary">Save</button></span>
-								</p>
-							</form>
-
-							<div class="list-group js-lobbygames"></div>
-
-							<button class="btn btn-primary js-newgame">New Game</button>
-							<button class="btn btn-secondary js-refreshlobby">Refresh Lobby</button>
-
-						</div>
-					</div>
+				<div class="col-xs-12">
+					<h2>Lobby</h2>
+					<p>
+						<button class="btn btn-primary js-newgame">New Game</button>
+						<button class="btn btn-secondary js-refreshlobby">Refresh Lobby</button>
+					</p>
+					<div class="list-group js-lobbygames"></div>
 				</div>
 			</div>
 		</script>
 
 		<script type="text/template" id="template-lobbygamelistitem">
-			<a class="list-group-item" href="#game/<%= id %>">
+			<a class="list-group-item animated fadeInUp" href="#game/<%= id %>">
 				ID: <%= id %> |
 				Players: <%= numberOfPlayers %> |
 				<%
 					var roundedSeconds = Math.round(secondsSinceLastPlayerJoined);
-					var minutes = roundedSeconds / 60;
+					var minutes = Math.round(roundedSeconds / 60);
 					var hours = minutes / 60;
 					var formattedTimeString = "just now";
-					if (hours > 0)
+					if (hours > 1){
 						formattedTimeString = "over an hour ago :(";
-					else if (minutes > 1)
+					} else if (minutes > 1) {
 						formattedTimeString = minutes + " minutes ago";
+					}
 				%>
 				Last player joined <%= formattedTimeString %>
 			</a>
@@ -181,29 +174,26 @@
 		<script type="text/template" id="template-about">
 			<div class="row">
 				<div class="col-xs-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">About</div>
-						<div class="panel-body">
-							<p>
-								This game is pretty much a complete rip-off of <a href="http://cardsagainsthumanity.com" target="_blank">Cards Against Humanity</a>, used under the BY-NC-SA 2.0 Creative Commons license.
-							</p>
-							<p>
-								Card data is from <a href="https://github.com/samurailink3/hangouts-against-humanity/" target="_blank">https://github.com/samurailink3/hangouts-against-humanity/</a>.
-							</p>
-							<p>
-								Source code available at <a href="https://github.com/ryandeba/cardsAgainstHumanity" target="_blank">https://github.com/ryandeba/cardsAgainstHumanity</a>.
-							</p>
-							<p>
-								Upcoming features in no particular order:
-								<ul>
-									<li>Support for questions with more than one answer</li>
-									<li>Pick which expansions to include</li>
-									<li>Create your own cards</li>
-									<li>Mobile friendly</li>
-								</ul>
-							</p>
-						</div>
-					</div>
+					<h2>About</h2>
+					<p>
+						This game is pretty much a complete rip-off of <a href="http://cardsagainsthumanity.com" target="_blank">Cards Against Humanity</a>, used under the BY-NC-SA 2.0 Creative Commons license.
+					</p>
+					<p>
+						Card data is from <a href="https://github.com/samurailink3/hangouts-against-humanity/" target="_blank">https://github.com/samurailink3/hangouts-against-humanity/</a>.
+					</p>
+					<p>
+						Source code available at <a href="https://github.com/ryandeba/cardsAgainstHumanity" target="_blank">https://github.com/ryandeba/cardsAgainstHumanity</a>.
+					</p>
+					<p>
+						Upcoming features in no particular order:
+						<ul>
+							<li>Support for questions with more than one answer</li>
+							<li>Pick which expansions to include</li>
+							<li>Create your own cards</li>
+							<li>Mobile friendly</li>
+							<li>In-game chat</li>
+						</ul>
+					</p>
 				</div>
 			</div>
 		</script>
