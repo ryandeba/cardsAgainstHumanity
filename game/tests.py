@@ -3,6 +3,11 @@ from django.utils import timezone
 
 from game.models import Card, Player, Game, GamePlayer, GameCard, GameRound
 
+def createCards():
+	for i in range(30):
+		Card.objects.create(cardType = "A", numberOfAnswers = 0)
+		Card.objects.create(cardType = "Q", numberOfAnswers = 1)
+
 class GameMethodTests(TestCase):
 
 	def test_addPlayer_newPlayerIsAdded(self):
@@ -24,59 +29,15 @@ class GameMethodTests(TestCase):
 		self.assertEqual(game.gameplayer_set.all().count(), 1)
 
 	def test_startGame(self):
+		createCards()
 		game = Game.objects.create(active = 0)
 
-		for i in range(100):
-			Card.objects.create(cardType = "A")
-			Card.objects.create(cardType = "Q")
 		for i in range(3):
 			game.addPlayer(None)
 
 		game.startGame()
 
-		gameCards = game.gamecard_set.all()
-		self.assertEqual(len(gameCards), 200)
-
-	def test_startGame(self):
-		game = Game.objects.create(active = 0)
-
-	def test_getRandomUnusedAnswerCard_returnsRandomCard(self):
-		game = Game.objects.create()
-
-		for i in range(100):
-			Card.objects.create(text = str(i), cardType = "A")
-
-		for card in Card.objects.all():
-			game.gamecard_set.create(game = game, card = card)
-
-		cards = []
-		for i in range(10):
-			randomCard = game.getRandomUnusedAnswerCard()
-			if randomCard != None and randomCard not in cards:
-				cards.append(randomCard)
-
-		self.assertEqual(len(cards) > 5, True)
-
-	def test_getRandomUnusedAnswerCard_doesNotReturnAssignedCards(self):
-		game = Game.objects.create()
-		player = Player()
-		gamePlayer = game.gameplayer_set.create(game = game, player = player)
-		gameRound = game.gameround_set.create(
-			game = game,
-			gamePlayerQuestioner = gamePlayer,
-			gameCardQuestion = game.gamecard_set.create(game = game, card = Card.objects.create(cardType = "Q"))
-		)
-		card1 = Card.objects.create(cardType = "A")
-		card2 = Card.objects.create(cardType = "A")
-		card3 = Card.objects.create(cardType = "A")
-		game.gamecard_set.create(game = game, card = card1, gamePlayer = gamePlayer)
-		game.gamecard_set.create(game = game, card = card2)
-		gameRoundAnswerCard = game.gamecard_set.create(game = game, card = card3)
-		gameRoundAnswer = gameRound.gameroundanswer_set.create(gameRound = gameRound, gameCard = gameRoundAnswerCard, gamePlayer = gamePlayer)
-
-		randomCard = game.getRandomUnusedAnswerCard()
-
-		self.assertEqual(randomCard.id, card2.id)
+		self.assertEqual(game.active, 1)
 
 	def test_getRandomUnusedQuestionCard_returnsRandomCard(self):
 		game = Game.objects.create()
@@ -105,13 +66,10 @@ class GameMethodTests(TestCase):
 		self.assertEqual(randomCard.id, card2.id)
 
 	def test_dealAnswerCards_eachPlayerEndsUpWith10Cards(self):
-		game = Game.objects.create()
+		createCards()
+		game = Game.objects.create(active = 1)
 		gameplayer1 = game.gameplayer_set.create(game = game)
 		gameplayer2 = game.gameplayer_set.create(game = game)
-
-		for i in range(100):
-			card = Card.objects.create(cardType = "A")
-			game.gamecard_set.create(game = game, card = card)
 
 		game.dealAnswerCards()
 

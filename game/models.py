@@ -21,11 +21,23 @@ class Player(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class GameManager(models.Manager):
+	def create(self, active = 0):
+		game = super(GameManager, self).create(active = active)
+		game.addCards()
+		return game
+
 class Game(models.Model):
 	active = models.IntegerField(default = 0) #0 - lobby, 1 - active, 2 - finished #TODO: rename this column to status or something
 
+	objects = GameManager()
+
 	def __unicode__(self):
 		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
+
+	def addCards(self):
+		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.filter(numberOfAnswers__lt = 2)])
+		return
 
 	def getNumberOfPlayers(self):
 		return self.gameplayer_set.all().count()
@@ -62,9 +74,6 @@ class Game(models.Model):
 
 	def startGame(self):
 		if self.isReadyToStart():
-			self.active = -1
-			self.save()
-			self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.filter(numberOfAnswers__lt = 2)])
 			self.active = 1
 			self.save()
 			self.newRound()
@@ -74,14 +83,12 @@ class Game(models.Model):
 		return self.active == 0 and self.getNumberOfPlayers() > 2
 
 	def dealAnswerCards(self):
+		unusedAnswerCards = list(self.gamecard_set.all().filter(card__cardType = "A", gamePlayer = None, gameroundanswer = None).order_by("?"))
 		for gamePlayer in self.gameplayer_set.all():
 			while len(self.gamecard_set.all().filter(gamePlayer = gamePlayer)) < 10:
-				gameCard = self.getRandomUnusedAnswerCard()
+				gameCard = unusedAnswerCards.pop()
 				gameCard.gamePlayer = gamePlayer
 				gameCard.save()
-
-	def getRandomUnusedAnswerCard(self):
-		return self.gamecard_set.all().filter(card__cardType = "A", gamePlayer = None, gameroundanswer = None).order_by("?").first()
 
 	def getRandomUnusedQuestionCard(self):
 		return self.gamecard_set.all().filter(card__cardType = "Q", gamePlayer = None, gameround = None).order_by("?").first()
