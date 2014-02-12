@@ -68,9 +68,18 @@
 		</div>
 
 		<script type="text/template" id="template-game">
+			<ul class="nav nav-pills nav-justified">
+				<li id="nav-currentround" class="<%= mode == 'currentRound' ? 'active' : '' %>"><a href="#game/<%= id %>/currentRound">Current Round</a></li>
+				<li id="nav-players" class="<%= mode == 'players' ? 'active' : '' %>"><a href="#game/<%= id %>/players">Players / Score</a></li>
+				<!--
+				<li id="nav-chat" class="<%= mode == 'chat' ? 'active' : '' %>"><a href="#game/<%= id %>/chat">Chat</a></li>
+				-->
+				<li id="nav-previousrounds" class="<%= mode == 'previousRounds' ? 'active' : '' %>"><a href="#game/<%= id %>/previousRounds">Previous Rounds</a></li>
+			</ul>
+
 			<div class="row">
-				<div class="col-xs-8">
-					<div class="well" style="min-height: 240px;">
+				<div class="col-xs-12">
+					<div class="well">
 						<% if (active == 1) { %>
 							<h4 class="text-center">
 								<% if (currentRoundWinner != undefined){ %>
@@ -104,23 +113,6 @@
 						<% } %>
 					</div>
 				</div>
-				<div class="col-xs-4">
-					<div class="well" style="min-height: 240px;">
-						<h4 class="text-center">Players</h4>
-						<ol class="js-gameplayers">
-							<% for (var i = 0; i < gamePlayers.length; i++){ %>
-								<li>
-									<%= gamePlayers[i].id == currentRoundQuestioner.id ? "*" : "" %>
-									<%= gamePlayers[i].name  %>
-									(<%= gamePlayers[i].points  %>)
-								</li>
-							<% } %>
-						</ol>
-						<% if (active == 0){ %>
-							<button type="button" class="btn btn-primary js-add-bot">Add bot</button>
-						<% } %>
-					</div>
-				</div>
 			</div>
 
 			<div class="row">
@@ -134,10 +126,6 @@
 					<% } %>
 				<% } %>
 			</div>
-		</script>
-
-		<script type="text/template" id="template-gameplayer">
-			<%= $.trim(name).length == 0 ? 'Anonymous' : name %>
 		</script>
 
 		<script type="text/template" id="template-lobby">

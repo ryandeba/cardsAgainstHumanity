@@ -5,6 +5,10 @@ $(function(){
 		},
 
 		routes: {
+			"game/:id/currentRound": "gameCurrentRound",
+			"game/:id/players": "gamePlayers",
+			"game/:id/chat": "gameChat",
+			"game/:id/previousRounds": "gamePreviousRounds",
 			"game/:id": "game",
 			"about": "about",
 			"lobby": "lobby",
@@ -18,6 +22,26 @@ $(function(){
 
 		game: function(id){
 			cardsAgainstHumanity.vent.trigger("showGame", id);
+		},
+
+		gameCurrentRound: function(id){
+			this.game(id);
+			cardsAgainstHumanity.vent.trigger("showGame:currentRound", id);
+		},
+
+		gamePlayers: function(id){
+			this.game(id);
+			cardsAgainstHumanity.vent.trigger("showGame:players", id);
+		},
+
+		gameChat: function(id){
+			this.game(id);
+			cardsAgainstHumanity.vent.trigger("showGame:chat", id);
+		},
+
+		gamePreviousRounds: function(id){
+			this.game(id);
+			cardsAgainstHumanity.vent.trigger("showGame:previousRounds", id);
 		},
 
 		about: function(){

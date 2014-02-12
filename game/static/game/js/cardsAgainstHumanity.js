@@ -1,6 +1,6 @@
 $(function(){
 
-	var game;
+	//var game;
 
 	cardsAgainstHumanity = new Backbone.Marionette.Application();
 
@@ -52,11 +52,13 @@ $(function(){
 	};
 
 	var showGame = function(id){
-		game.set("id", id);
-		var gameView = new cardsAgainstHumanity.GameView({
-			model: game
-		});
-		cardsAgainstHumanity.main.show(gameView);
+		if (game.get("id") != id){
+			game.set("id", id);
+			var gameView = new cardsAgainstHumanity.GameView({
+				model: game
+			});
+			cardsAgainstHumanity.main.show(gameView);
+		}
 	};
 
 	var initUser = function(username){

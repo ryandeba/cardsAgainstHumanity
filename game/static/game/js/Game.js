@@ -2,6 +2,7 @@ $(function(){
 
 	cardsAgainstHumanity.Game = Backbone.Model.extend({
 		defaults: {
+			mode: "currentRound",
 			active: undefined,
 			gamePlayers: [],
 			gameRounds: [],
@@ -11,6 +12,11 @@ $(function(){
 		initialize: function(){
 			var self = this;
 			self.load();
+
+			self.listenTo(cardsAgainstHumanity.vent, "showGame:currentRound", self.setModeCurrentRound);
+			self.listenTo(cardsAgainstHumanity.vent, "showGame:players", self.setModePlayers);
+			self.listenTo(cardsAgainstHumanity.vent, "showGame:chat", self.setModeChat);
+			self.listenTo(cardsAgainstHumanity.vent, "showGame:previousRounds", self.setModePreviousRounds);
 			self.listenTo(self, "addBot", self.addBot);
 			self.listenTo(self, "start", self.start);
 			self.listenTo(self, "submitAnswer", self.submitAnswer);
@@ -21,6 +27,11 @@ $(function(){
 				self.load();
 			}, 5000);
 		},
+
+		setModeCurrentRound: function(){ this.set("mode", "currentRound"); },
+		setModePlayers: function(){ this.set("mode", "players"); },
+		setModeChat: function(){ this.set("mode", "chat"); },
+		setModePreviousRounds: function(){ this.set("mode", "previousRounds"); },
 
 		toJSON: function(){
 			return _.extend(this.attributes, {
@@ -90,9 +101,7 @@ $(function(){
 			}
 			$.ajax({
 				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList() + "&tpac_id=" + self.getThisPlayerAnswerCardsIDList(),
-				success: function(response){
-					self.loadSuccess(response);
-				}
+				success: function(response){ self.loadSuccess(response); }
 			});
 		},
 
@@ -100,7 +109,6 @@ $(function(){
 			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards);
 			response.gameRounds = this.get("gameRounds").concat(response.gameRounds);
 			this.set(response);
-			this.trigger("change");
 		},
 
 		addBot: function(){
