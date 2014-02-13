@@ -17,6 +17,7 @@ class Card(models.Model):
 class Player(models.Model):
 	hash = models.CharField(max_length = 32)
 	name = models.CharField(max_length = 50)
+	datetimeLastModified = models.DateTimeField(auto_now = True)
 
 	def __unicode__(self):
 		return self.name
@@ -29,6 +30,7 @@ class GameManager(models.Manager):
 
 class Game(models.Model):
 	active = models.IntegerField(default = 0) #0 - lobby, 1 - active, 2 - finished #TODO: rename this column to status or something
+	datetimeLastModified = models.DateTimeField(auto_now = True)
 
 	objects = GameManager()
 
@@ -173,6 +175,7 @@ class GamePlayer(models.Model):
 	game = models.ForeignKey(Game)
 	player = models.ForeignKey(Player, null = True)
 	datetimeCreated = models.DateTimeField(auto_now_add = True)
+	datetimeLastModified = models.DateTimeField(auto_now = True)
 
 	def getHash(self):
 		if self.player:
@@ -194,11 +197,13 @@ class GameCard(models.Model):
 	game = models.ForeignKey(Game)
 	card = models.ForeignKey(Card)
 	gamePlayer = models.ForeignKey(GamePlayer, null = True)
+	datetimeLastModified = models.DateTimeField(auto_now = True)
 
 class GameRound(models.Model):
 	game = models.ForeignKey(Game)
 	gameCardQuestion = models.ForeignKey(GameCard)
 	gamePlayerQuestioner = models.ForeignKey(GamePlayer)
+	datetimeLastModified = models.DateTimeField(auto_now = True)
 
 	def isComplete(self):
 		return self.gameroundanswer_set.all().filter(winner = 1).count() > 0

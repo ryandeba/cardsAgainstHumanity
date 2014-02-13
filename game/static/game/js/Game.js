@@ -6,7 +6,8 @@ $(function(){
 			active: undefined,
 			gamePlayers: [],
 			gameRounds: [],
-			thisPlayersAnswerCards: []
+			thisPlayersAnswerCards: [],
+			lastUpdated: 0
 		},
 
 		initialize: function(){
@@ -78,29 +79,13 @@ $(function(){
 			return thisGamePlayer != undefined ? thisGamePlayer.gameCards : [];
 		},
 
-		getCompletedGameRoundIDList: function(){
-			var result = "";
-			_.each( _.where(this.get("gameRounds"), {isComplete: true}), function(gameRound){
-				result += gameRound.id + ",";
-			});
-			return result;
-		},
-
-		getThisPlayerAnswerCardsIDList: function(){
-			var result = "";
-			_.each(this.get("thisPlayersAnswerCards"), function(answerCard){
-				result += answerCard.card_id + ",";
-			});
-			return result;
-		},
-
 		load: function(){
 			var self = this;
 			if (self.get("id") == undefined){
 				return;
 			}
 			$.ajax({
-				url: "/game/" + self.get("id") + "?gr_id=" + self.getCompletedGameRoundIDList() + "&tpac_id=" + self.getThisPlayerAnswerCardsIDList(),
+				url: "/game/" + self.get("id") + "?lastUpdated=" + self.get("lastUpdated"),
 				success: function(response){ self.loadSuccess(response); }
 			});
 		},

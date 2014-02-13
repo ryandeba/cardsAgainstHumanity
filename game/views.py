@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.utils.dateformat import format
+from django.utils.timezone import utc
+from django.db.models import Q
 
 from game.models import Player, Game
 
-import random, json
+import random, json, time, datetime
 
 def index(request):
 	playerhash = "%032x" % random.getrandbits(128)
@@ -62,8 +65,7 @@ def game(request, game_id):
 	responseData = getGameJSON(
 		game = game,
 		thisPlayer = gamePlayer,
-		gameRoundIDsToExclude = request.GET.get("gr_id", ""),
-		gameCardIDsToExclude = request.GET.get("tpac_id", "")
+		datetimeLastUpdated = datetime.datetime.utcfromtimestamp(float(request.GET.get("lastUpdated", "0"))).replace(tzinfo = utc)
 	)
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
@@ -83,15 +85,16 @@ def chooseWinner(request, game_id, card_id):
 	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
 	return HttpResponse(status = 200)
 
-def getGameJSON(game, thisPlayer, gameRoundIDsToExclude, gameCardIDsToExclude):
-	return {
+def getGameJSON(game, thisPlayer, datetimeLastUpdated):
+	result = {
+		"lastUpdated": datetimeToEpoch(datetime.datetime.utcnow()),
 		"id": game.id,
 		"active": game.active,
 		"thisPlayersAnswerCards": [
 			{
 				"card_id": gameCard.card.id,
 				"text": gameCard.card.text
-			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer).exclude(gamePlayer_id = None) if str(gameCard.card_id) not in gameCardIDsToExclude.split(",")
+			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer, datetimeLastModified__gte = datetimeLastUpdated).exclude(gamePlayer_id = None)
 		],
 		"gamePlayers": [
 			{
@@ -99,7 +102,7 @@ def getGameJSON(game, thisPlayer, gameRoundIDsToExclude, gameCardIDsToExclude):
 				"hash": gamePlayer.getHash(),
 				"name": gamePlayer.getName(),
 				"points": gamePlayer.getPoints(),
-			} for gamePlayer in game.gameplayer_set.all().order_by("id")
+			} for gamePlayer in game.gameplayer_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(player__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id")
 		],
 		"gameRounds": [
 			{
@@ -115,6 +118,16 @@ def getGameJSON(game, thisPlayer, gameRoundIDsToExclude, gameCardIDsToExclude):
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all()
 				],
-			} for gameRound in game.gameround_set.all().order_by("id") if str(gameRound.id) not in gameRoundIDsToExclude.split(",")
+			} for gameRound in game.gameround_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated).order_by("id")
 		],
 	}
+	if len(result['gameRounds']) == 0:
+		del result['gameRounds']
+	if len(result['gamePlayers']) == 0:
+		del result['gamePlayers']
+	if len(result['thisPlayersAnswerCards']) == 0:
+		del result['thisPlayersAnswerCards']
+	return result
+
+def datetimeToEpoch(datetime):
+	return str(time.mktime(datetime.timetuple()) + float("0.%s" % datetime.microsecond))
