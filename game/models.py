@@ -37,7 +37,7 @@ class Game(models.Model):
 		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
 
 	def addCards(self):
-		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.filter(numberOfAnswers__lt = 2)])
+		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.filter(expansion = 'Base', numberOfAnswers__lt = 2)])
 		return
 
 	def getNumberOfPlayers(self):

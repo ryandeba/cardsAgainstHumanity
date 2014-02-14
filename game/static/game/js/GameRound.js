@@ -6,9 +6,11 @@ $(function(){
 		},
 
 		initialize: function(){
-			this.set("answerCards", new cardsAgainstHumanity.AnswerCards());
-			this.updateAnswerCards();
-			this.listenTo(this, "change:answers", this.updateAnswerCards);
+			var self = this;
+			self.set("answerCards", new cardsAgainstHumanity.AnswerCards());
+			self.updateAnswerCards();
+			self.listenTo(self, "change:answers", self.updateAnswerCards);
+			self.listenTo(self.get("answerCards"), "change", function(){ self.trigger("change"); });
 		},
 
 		updateAnswerCards: function(){

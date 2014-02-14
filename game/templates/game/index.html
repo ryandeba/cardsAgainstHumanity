@@ -38,6 +38,10 @@
 			.is-clickable {
 				cursor: pointer;
 			}
+
+			#thisPlayersAnswerCards .card {
+				font-size: 11px;
+			}
 		</style>
 
 		<script src="{% static 'game/js/vendor/jQuery.js' %}"></script>
@@ -95,6 +99,7 @@
 		</div>
 
 		<script type="text/template" id="template-game">
+<% console.log('rendering') %>
 			<ul class="nav nav-pills nav-justified">
 				<li id="nav-currentround" class="<%= mode == 'currentRound' ? 'active' : '' %>"><a href="#game/<%= id %>/currentRound">Current Round</a></li>
 				<li id="nav-players" class="<%= mode == 'players' ? 'active' : '' %>"><a href="#game/<%= id %>/players">Players / Score</a></li>
@@ -104,70 +109,94 @@
 				<li id="nav-previousrounds" class="<%= mode == 'previousRounds' ? 'active' : '' %>"><a href="#game/<%= id %>/previousRounds">Previous Rounds</a></li>
 			</ul>
 
-			<div class="row">
-				<div class="col-xs-12">
-					<% if (active == 1) { %>
-						<h4>
-							<%= currentRoundQuestioner.get('name') %> wants to know...
-						</h4>
-						<div class="row">
-							<div class="col-md-3 col-sm-4 col-xs-6">
-								<div class="card question"><div><%= currentRoundQuestion.replace("_", "______") %></div></div>
+			<% if (mode == 'currentRound') { %>
+				<div class="row">
+					<div class="col-xs-12">
+						<% if (active == 1) { %>
+							<h4>
+								<%= currentRoundQuestioner.get('name') %> wants to know...
+							</h4>
+							<div class="row">
+								<div class="col-md-3 col-sm-4 col-xs-6">
+									<div class="card question"><div><%= currentRoundQuestion.replace("_", "______") %></div></div>
+								</div>
+
+								<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
+									<% for (var i = 0; i < currentRoundAnswers.length; i++) { %>
+											<div class="col-md-3 col-sm-4 col-xs-6">
+											<div class="card answer js-round-answer" data-id="<%= currentRoundAnswers.at(i).get('card_id') %>">
+												<div>
+													<%= currentRoundAnswers.at(i).get('text') %>
+													<%= currentRoundAnswers.at(i).get('winner') == 1 ? "*" : "" %>
+												</div>
+											</div>
+											<%= currentRoundWinner != undefined ? 'asdf' : '' %>
+										</div>
+									<% } %>
+								<% } else { %>
+									<p>Waiting for all players to submit answers</p>
+								<% } %>
+
 							</div>
 
-							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
-								<% for (var i = 0; i < currentRoundAnswers.length; i++) { %>
-										<div class="col-md-3 col-sm-4 col-xs-6">
-										<div class="card answer js-round-answer" data-id="<%= currentRoundAnswers.at(i).get('card_id') %>">
-											<div>
-												<%= currentRoundAnswers.at(i).get('text') %>
-												<%= currentRoundAnswers.at(i).get('winner') == 1 ? "*" : "" %>
-											</div>
-										</div>
-										<%= currentRoundWinner != undefined ? 'asdf' : '' %>
-									</div>
+						<% } else if (active == 0) { %>
+							<h3 class="text-center">Waiting for other players to join</h3>
+							<button type="button" class="btn btn-primary js-addbot">Add bot</button>
+							<% if (gamePlayers.length >= 3){ %>
+								<button type="button" class="btn btn-primary js-startgame">Start Game</button>
+							<% } %>
+							<h4>Players</h4>
+							<ol>
+								<% for (var i = 0; i < gamePlayers.length; i++) { %>
+									<li><%= gamePlayers[i].name %></li>
 								<% } %>
-							<% } else { %>
-								<p>Waiting for all players to submit answers</p>
-							<% } %>
-
-						</div>
-
-					<% } else if (active == 0) { %>
-						<h3 class="text-center">Waiting for other players to join</h3>
-						<button type="button" class="btn btn-primary js-addbot">Add bot</button>
-						<% if (gamePlayers.length >= 3){ %>
-							<button type="button" class="btn btn-primary js-startgame">Start Game</button>
+							</ol>
+						<% } else if (active == 2) { %>
+							<h3 class="text-center">Game Over</h3>
+						<% } else { %>
+							<h3 class="text-center">Loading...</h3>
 						<% } %>
-						<h4>Players</h4>
-						<ol>
-							<% for (var i = 0; i < gamePlayers.length; i++) { %>
-								<li><%= gamePlayers[i].name %></li>
-							<% } %>
-						</ol>
-					<% } else if (active == 2) { %>
-						<h3 class="text-center">Game Over</h3>
-					<% } else { %>
-						<h3 class="text-center">Loading...</h3>
-					<% } %>
+					</div>
 				</div>
-			</div>
 
-			<hr>
+				<hr>
 
-			<div class="row">
-				<% if (active == 1){ %>
-					<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
-						<div class="col-md-3 col-sm-4 col-xs-6">
-							<div class="card answer js-answercard" data-id="<%= thisPlayersAnswerCards.at(i).get('card_id') %>">
-								<div>
-									<%= thisPlayersAnswerCards.at(i).get('text') %>
+				<div id="thisPlayersAnswerCards" class="row">
+					<% if (active == 1){ %>
+						<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
+							<div class="col-md-2 col-sm-3 col-xs-4">
+								<div class="card answer js-answercard" data-id="<%= thisPlayersAnswerCards.at(i).get('card_id') %>">
+									<div>
+										<%= thisPlayersAnswerCards.at(i).get('text') %>
+									</div>
 								</div>
 							</div>
-						</div>
+						<% } %>
 					<% } %>
-				<% } %>
-			</div>
+				</div>
+			<% } else if (mode == 'players') {%>
+				<div class="row">
+					<div class="col-xs-12">
+						<ol>
+							<% for (var i = 0; i < gamePlayers.length; i++) { %>
+								<li><%= gamePlayers.at(i).get("name") %></li>
+							<% } %>
+						</ol>
+					</div>
+				</div>
+			<% } else if (mode == 'previousRounds') {%>
+				<div class="row">
+					<div class="col-xs-12">
+						<ol>
+							<% for (var i = 0; i < gameRounds.length; i++) { %>
+								<li>
+									<%= gameRounds.at(i).get("question") %>
+								</li>
+							<% } %>
+						</ol>
+					</div>
+				</div>
+			<% } %>
 		</script>
 
 		<script type="text/template" id="template-lobby">

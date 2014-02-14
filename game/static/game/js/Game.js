@@ -23,6 +23,7 @@ $(function(){
 			self.listenTo(self, "submitAnswer", self.submitAnswer);
 			self.listenTo(self, "chooseWinner", self.chooseWinner);
 			self.listenTo(self, "change:id", self.load);
+			self.listenTo(self.get("thisPlayersAnswerCards"), "remove", function(){ self.trigger("change"); });
 
 			setInterval(function(){
 				self.load();
@@ -118,9 +119,7 @@ $(function(){
 			var self = this;
 			$.ajax({
 				url: "/game/" + self.get("id") + "/submitAnswer/" + data.id,
-				success: function(response){
-					self.get("thisPlayersAnswerCards").remove(self.get("thisPlayersAnswerCards").findWhere({card_id: parseInt(data.id)}));
-				}
+				success: function(response){ self.load(); }
 			});
 		},
 
