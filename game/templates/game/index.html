@@ -148,7 +148,7 @@
 							<h4>Players</h4>
 							<ol>
 								<% for (var i = 0; i < gamePlayers.length; i++) { %>
-									<li><%= gamePlayers[i].name %></li>
+									<li><%= gamePlayers.at(i).get('name') %></li>
 								<% } %>
 							</ol>
 						<% } else if (active == 2) { %>
