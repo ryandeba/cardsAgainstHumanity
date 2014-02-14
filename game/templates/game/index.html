@@ -10,14 +10,11 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/bootstrap.min.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/animate.css' %}" />
 		<style>
-			.xcard:hover {
-				box-shadow: 0px 0px 15px #fff;
-				cursor: pointer;
-			}
 			.card {
 				border: 1px solid black;
 				border-radius: 5px;
 				display: inline-block;
+				font-size: 12px;
 				padding-bottom: 130%;
 				position: relative;
 				width: 100%;
@@ -35,6 +32,9 @@
 				background-color: white;
 				color: black;
 			}
+			.card.is-clickable:hover {
+				box-shadow: 0px 0px 15px #fff;
+			}
 			.is-clickable {
 				cursor: pointer;
 			}
@@ -51,8 +51,11 @@
 		<script src="{% static 'game/js/User.js' %}"></script>
 		<script src="{% static 'game/js/About.js' %}"></script>
 		<script src="{% static 'game/js/Lobby.js' %}"></script>
-		<script src="{% static 'game/js/Game.js' %}"></script>
+		<script src="{% static 'game/js/GamePlayer.js' %}"></script>
+		<script src="{% static 'game/js/AnswerCard.js' %}"></script>
+		<script src="{% static 'game/js/GameRound.js' %}"></script>
 		<script src="{% static 'game/js/GameSetup.js' %}"></script>
+		<script src="{% static 'game/js/Game.js' %}"></script>
 		<script src="{% static 'game/js/Router.js' %}"></script>
 
 		<script>
@@ -105,7 +108,7 @@
 				<div class="col-xs-12">
 					<% if (active == 1) { %>
 						<h4>
-							<%= currentRoundQuestioner.name %> wants to know...
+							<%= currentRoundQuestioner.get('name') %> wants to know...
 						</h4>
 						<div class="row">
 							<div class="col-md-3 col-sm-4 col-xs-6">
@@ -115,10 +118,10 @@
 							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
 								<% for (var i = 0; i < currentRoundAnswers.length; i++) { %>
 										<div class="col-md-3 col-sm-4 col-xs-6">
-										<div class="card answer js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
+										<div class="card answer js-round-answer" data-id="<%= currentRoundAnswers.at(i).get('card_id') %>">
 											<div>
-												<%= currentRoundAnswers[i].text %>
-												<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
+												<%= currentRoundAnswers.at(i).get('text') %>
+												<%= currentRoundAnswers.at(i).get('winner') == 1 ? "*" : "" %>
 											</div>
 										</div>
 										<%= currentRoundWinner != undefined ? 'asdf' : '' %>
@@ -156,9 +159,9 @@
 				<% if (active == 1){ %>
 					<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
 						<div class="col-md-3 col-sm-4 col-xs-6">
-							<div class="card answer js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>">
+							<div class="card answer js-answercard" data-id="<%= thisPlayersAnswerCards.at(i).get('card_id') %>">
 								<div>
-									<%= thisPlayersAnswerCards[i].text %>
+									<%= thisPlayersAnswerCards.at(i).get('text') %>
 								</div>
 							</div>
 						</div>

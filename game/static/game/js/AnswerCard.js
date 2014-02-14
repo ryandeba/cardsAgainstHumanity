@@ -1,16 +1,11 @@
 $(function(){
 
 	cardsAgainstHumanity.AnswerCard = Backbone.Model.extend({
-	});
-
-	cardsAgainstHumanity.AnswerCardView = Backbone.Marionette.ItemView.extend({
+		idAttribute: "card_id"
 	});
 
 	cardsAgainstHumanity.AnswerCards = Backbone.Collection.extend({
 		model: cardsAgainstHumanity.AnswerCard
-	});
-
-	cardsAgainstHumanity.AnswerCardsView = Backbone.Marionette.CollectionView.extend({
 	});
 
 });

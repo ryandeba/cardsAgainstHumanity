@@ -4,9 +4,9 @@ $(function(){
 		defaults: {
 			mode: "currentRound",
 			active: undefined,
-			gamePlayers: [],
-			gameRounds: [],
-			thisPlayersAnswerCards: [],
+			gamePlayers: new cardsAgainstHumanity.GamePlayers(),
+			gameRounds: new cardsAgainstHumanity.GameRounds(),
+			thisPlayersAnswerCards: new cardsAgainstHumanity.AnswerCards(),
 			lastUpdated: 0
 		},
 
@@ -47,36 +47,34 @@ $(function(){
 		getCurrentRoundQuestioner: function(){
 			if (this.get("gameRounds").length == 0)
 				return "";
-			var currentRoundQuestioner_id = _.last(this.get("gameRounds")).gamePlayerQuestioner_id;
-			return _.findWhere(this.get("gamePlayers"), {id: currentRoundQuestioner_id});
+			var currentRoundQuestioner_id = this.get("gameRounds").last().get("gamePlayerQuestioner_id");
+			return this.get("gamePlayers").findWhere({id: currentRoundQuestioner_id});
 		},
 
 		getCurrentRoundQuestion: function(){
 			if (this.get("gameRounds").length == 0)
 				return "";
-			return _.last(this.get("gameRounds")).question;
+			return this.get("gameRounds").last().get("question");
 		},
 
 		getCurrentRoundAnswers: function(){
 			if (this.get("gameRounds").length == 0)
 				return [];
-			return _.last(this.get("gameRounds")).answers
+			return this.get("gameRounds").last().get("answerCards");
 		},
 
 		getCurrentRoundWinner: function(){
 			if (this.get("gameRounds").length == 0)
 				return undefined;
-			var lastRound = _.last(this.get("gameRounds"));
-			var winningAnswer = _.findWhere(lastRound.answers, {winner: 1});
+			var lastRound = this.get("gameRounds").last();
+			var winningAnswer = lastRound.get("answerCards").findWhere({winner: 1});
 			if (winningAnswer == undefined)
 				return undefined
-			return _.findWhere(this.get("gamePlayers"), {id: winningAnswer.gameplayer_id});
+			return this.get("gamePlayers").findWhere({id: winningAnswer.gameplayer_id});
 		},
 
 		getThisPlayersAnswerCards: function(){
 			return this.get("thisPlayersAnswerCards");
-			var thisGamePlayer = _.findWhere(this.get("gamePlayers"), {hash: cardsAgainstHumanity.playerhash});
-			return thisGamePlayer != undefined ? thisGamePlayer.gameCards : [];
 		},
 
 		load: function(){
@@ -91,9 +89,12 @@ $(function(){
 		},
 
 		loadSuccess: function(response){
-			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards || []);
-			response.gameRounds = this.get("gameRounds").concat(response.gameRounds || []);
-			response.gamePlayers = this.get("gamePlayers").concat(response.gamePlayers || []);
+			this.get("thisPlayersAnswerCards").set(response.thisPlayersAnswerCards || [], {remove: false});
+			this.get("gameRounds").set(response.gameRounds || [], {remove: false});
+			this.get("gamePlayers").set(response.gamePlayers || [], {remove: false});
+			delete response.thisPlayersAnswerCards;
+			delete response.gameRounds;
+			delete response.gamePlayers;
 			this.set(response);
 		},
 
@@ -115,12 +116,11 @@ $(function(){
 
 		submitAnswer: function(data){
 			var self = this;
-			self.set("thisPlayersAnswerCards", _.without(self.get("thisPlayersAnswerCards"),
-				_.findWhere(self.get("thisPlayersAnswerCards"), {card_id: parseInt(data.id)})
-			));
 			$.ajax({
 				url: "/game/" + self.get("id") + "/submitAnswer/" + data.id,
-				success: function(response){ self.load(); }
+				success: function(response){
+					self.get("thisPlayersAnswerCards").remove(self.get("thisPlayersAnswerCards").findWhere({card_id: parseInt(data.id)}));
+				}
 			});
 		},
 

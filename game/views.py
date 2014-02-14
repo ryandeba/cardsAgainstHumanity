@@ -74,8 +74,9 @@ def submitAnswer(request, game_id, card_id):
 	game = Game.objects.get(id = game_id)
 	gamePlayer = game.gameplayer_set.get(game = game, player = player)
 	gameCard = game.gamecard_set.get(game = game, gamePlayer = gamePlayer, card_id = card_id)
-	game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard)
-	return HttpResponse(status = 200)
+	if game.gamePlayerSubmitsAnswerCard(gamePlayer, gameCard):
+		return HttpResponse(status = 200)
+	return HttpResponse(status = 403)
 
 def chooseWinner(request, game_id, card_id):
 	game = Game.objects.get(id = game_id)
@@ -102,7 +103,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 				"hash": gamePlayer.getHash(),
 				"name": gamePlayer.getName(),
 				"points": gamePlayer.getPoints(),
-			} for gamePlayer in game.gameplayer_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(player__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id")
+			} for gamePlayer in game.gameplayer_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(player__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()
 		],
 		"gameRounds": [
 			{
@@ -118,7 +119,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 						"winner": answer.winner,
 					} for answer in gameRound.gameroundanswer_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)
 				],
-			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id")
+			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()
 		],
 	}
 	if len(result['gameRounds']) == 0:
