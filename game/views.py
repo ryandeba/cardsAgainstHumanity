@@ -116,9 +116,9 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 						"gameplayer_id": answer.gamePlayer.id,
 						"card_id": answer.gameCard.card.id,
 						"winner": answer.winner,
-					} for answer in gameRound.gameroundanswer_set.all()
+					} for answer in gameRound.gameroundanswer_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)
 				],
-			} for gameRound in game.gameround_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated).order_by("id")
+			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id")
 		],
 	}
 	if len(result['gameRounds']) == 0:

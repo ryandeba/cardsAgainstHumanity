@@ -93,6 +93,7 @@ $(function(){
 		loadSuccess: function(response){
 			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards || []);
 			response.gameRounds = this.get("gameRounds").concat(response.gameRounds || []);
+			response.gamePlayers = this.get("gamePlayers").concat(response.gamePlayers || []);
 			this.set(response);
 		},
 
@@ -144,7 +145,7 @@ $(function(){
 		},
 
 		events: {
-			"click .js-add-bot": "addBot",
+			"click .js-addbot": "addBot",
 			"click .js-startgame": "startGame",
 			"click .js-answercard": "submitAnswer",
 			"click .js-round-answer": "chooseWinner"

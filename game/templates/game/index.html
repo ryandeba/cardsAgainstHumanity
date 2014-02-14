@@ -18,9 +18,14 @@
 				border: 1px solid black;
 				border-radius: 5px;
 				display: inline-block;
-				padding: 20px;
-				min-height: 300px;
+				padding-bottom: 130%;
+				position: relative;
 				width: 100%;
+			}
+			.card > div {
+				padding: 20px;
+				position: absolute;
+				top: 0; bottom: 0; left: 0; right: 0;
 			}
 			.card.question {
 				background-color: black;
@@ -103,17 +108,19 @@
 							<%= currentRoundQuestioner.name %> wants to know...
 						</h4>
 						<div class="row">
-							<div class="col-md-3 col-xs-6">
-								<span class="card question"><%= currentRoundQuestion.replace("_", "______") %></span>
+							<div class="col-md-3 col-sm-4 col-xs-6">
+								<div class="card question"><div><%= currentRoundQuestion.replace("_", "______") %></div></div>
 							</div>
 
 							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
 								<% for (var i = 0; i < currentRoundAnswers.length; i++) { %>
-									<div class="col-md-3 col-xs-6">
-										<span class="card answer js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
-											<%= currentRoundAnswers[i].text %>
-											<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
-										</span>
+										<div class="col-md-3 col-sm-4 col-xs-6">
+										<div class="card answer js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
+											<div>
+												<%= currentRoundAnswers[i].text %>
+												<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
+											</div>
+										</div>
 										<%= currentRoundWinner != undefined ? 'asdf' : '' %>
 									</div>
 								<% } %>
@@ -125,9 +132,16 @@
 
 					<% } else if (active == 0) { %>
 						<h3 class="text-center">Waiting for other players to join</h3>
+						<button type="button" class="btn btn-primary js-addbot">Add bot</button>
 						<% if (gamePlayers.length >= 3){ %>
 							<button type="button" class="btn btn-primary js-startgame">Start Game</button>
 						<% } %>
+						<h4>Players</h4>
+						<ol>
+							<% for (var i = 0; i < gamePlayers.length; i++) { %>
+								<li><%= gamePlayers[i].name %></li>
+							<% } %>
+						</ol>
 					<% } else if (active == 2) { %>
 						<h3 class="text-center">Game Over</h3>
 					<% } else { %>
@@ -141,9 +155,11 @@
 			<div class="row">
 				<% if (active == 1){ %>
 					<% for (var i = 0; i < thisPlayersAnswerCards.length; i++) { %>
-						<div class="col-xs-2">
-							<div class="well card js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>" style="height: 200px;">
-								<%= thisPlayersAnswerCards[i].text %>
+						<div class="col-md-3 col-sm-4 col-xs-6">
+							<div class="card answer js-answercard" data-id="<%= thisPlayersAnswerCards[i].card_id %>">
+								<div>
+									<%= thisPlayersAnswerCards[i].text %>
+								</div>
 							</div>
 						</div>
 					<% } %>
