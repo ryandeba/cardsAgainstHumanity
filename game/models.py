@@ -31,7 +31,6 @@ class GameManager(models.Manager):
 class Game(models.Model):
 	active = models.IntegerField(default = 0) #0 - lobby, 1 - active, 2 - finished #TODO: rename this column to status or something
 	datetimeLastModified = models.DateTimeField(auto_now = True)
-
 	objects = GameManager()
 
 	def __unicode__(self):

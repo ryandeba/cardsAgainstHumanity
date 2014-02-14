@@ -87,25 +87,23 @@ def chooseWinner(request, game_id, card_id):
 	return HttpResponse(status = 200)
 
 def getGameJSON(game, thisPlayer, datetimeLastUpdated):
-	result = {
-		"lastUpdated": datetimeToEpoch(datetime.datetime.utcnow()),
-		"id": game.id,
-		"active": game.active,
-		"thisPlayersAnswerCards": [
+	thisPlayersAnswerCards = [
 			{
 				"card_id": gameCard.card.id,
 				"text": gameCard.card.text
 			} for gameCard in game.gamecard_set.filter(game = game, gamePlayer = thisPlayer, datetimeLastModified__gte = datetimeLastUpdated).exclude(gamePlayer_id = None)
-		],
-		"gamePlayers": [
+		]
+
+	gamePlayers = [
 			{
 				"id": gamePlayer.id,
 				"hash": gamePlayer.getHash(),
 				"name": gamePlayer.getName(),
 				"points": gamePlayer.getPoints(),
 			} for gamePlayer in game.gameplayer_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(player__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()
-		],
-		"gameRounds": [
+		]
+
+	gameRounds = [
 			{
 				"id": gameRound.id,
 				"gamePlayerQuestioner_id": gameRound.gamePlayerQuestioner_id,
@@ -120,14 +118,23 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 					} for answer in gameRound.gameroundanswer_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)
 				],
 			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()
-		],
+		]
+
+	if (
+		datetimeToEpoch(game.datetimeLastModified) < datetimeToEpoch(datetimeLastUpdated)
+		and len(thisPlayersAnswerCards) == 0
+		and len(gamePlayers) == 0
+		and len(gameRounds) == 0
+	):
+		return {}
+	result = {
+		"lastUpdated": datetimeToEpoch(datetime.datetime.utcnow()),
+		"id": game.id,
+		"active": game.active,
+		"thisPlayersAnswerCards": thisPlayersAnswerCards,
+		"gamePlayers": gamePlayers,
+		"gameRounds": gameRounds,
 	}
-	if len(result['gameRounds']) == 0:
-		del result['gameRounds']
-	if len(result['gamePlayers']) == 0:
-		del result['gamePlayers']
-	if len(result['thisPlayersAnswerCards']) == 0:
-		del result['thisPlayersAnswerCards']
 	return result
 
 def datetimeToEpoch(datetime):
