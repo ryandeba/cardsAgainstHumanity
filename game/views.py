@@ -65,7 +65,7 @@ def game(request, game_id):
 	responseData = getGameJSON(
 		game = game,
 		thisPlayer = gamePlayer,
-		datetimeLastUpdated = datetime.datetime.utcfromtimestamp(float(request.GET.get("lastUpdated", "0"))).replace(tzinfo = utc)
+		datetimeLastUpdated = timestampToDatetime(request.GET.get("lastUpdated", "0"))
 	)
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
@@ -131,3 +131,6 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 
 def datetimeToEpoch(datetime):
 	return str(time.mktime(datetime.timetuple()) + float("0.%s" % datetime.microsecond))
+
+def timestampToDatetime(timestamp):
+	return datetime.datetime.utcfromtimestamp(float(timestamp)).replace(tzinfo = utc)
