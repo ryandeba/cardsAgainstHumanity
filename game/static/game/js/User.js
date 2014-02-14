@@ -30,6 +30,7 @@ $(function(){
 
 		events: {
 			"keyup #username": "usernameChanged",
+			"change #username": "usernameChanged",
 			"submit": "usernameSubmit"
 		},
 
