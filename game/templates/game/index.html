@@ -10,8 +10,27 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/bootstrap.min.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'game/css/animate.css' %}" />
 		<style>
-			.card:hover {
+			.xcard:hover {
 				box-shadow: 0px 0px 15px #fff;
+				cursor: pointer;
+			}
+			.card {
+				border: 1px solid black;
+				border-radius: 5px;
+				display: inline-block;
+				padding: 20px;
+				min-height: 300px;
+				width: 100%;
+			}
+			.card.question {
+				background-color: black;
+				color: white;
+			}
+			.card.answer {
+				background-color: white;
+				color: black;
+			}
+			.is-clickable {
 				cursor: pointer;
 			}
 		</style>
@@ -79,41 +98,45 @@
 
 			<div class="row">
 				<div class="col-xs-12">
-					<div class="well">
-						<% if (active == 1) { %>
-							<h4 class="text-center">
-								<% if (currentRoundWinner != undefined){ %>
-									<%= currentRoundWinner.name %> wins! Next round will start soon.
-								<% } else { %>
-									<%= currentRoundQuestioner.name %> wants to know...
-								<% } %>
-							</h4>
-							<h2 class="text-center"><%= currentRoundQuestion %></h2>
+					<% if (active == 1) { %>
+						<h4>
+							<%= currentRoundQuestioner.name %> wants to know...
+						</h4>
+						<div class="row">
+							<div class="col-md-3 col-xs-6">
+								<span class="card question"><%= currentRoundQuestion.replace("_", "______") %></span>
+							</div>
 
 							<% if (currentRoundAnswers.length >= gamePlayers.length - 1) { %>
-								<% for (var i = 0; i < currentRoundAnswers.length; i++){ %>
-									<button class="btn btn-primary js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
-										<%= currentRoundAnswers[i].text %>
-										<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
-									</button>
+								<% for (var i = 0; i < currentRoundAnswers.length; i++) { %>
+									<div class="col-md-3 col-xs-6">
+										<span class="card answer js-round-answer" data-id="<%= currentRoundAnswers[i].card_id %>">
+											<%= currentRoundAnswers[i].text %>
+											<%= currentRoundAnswers[i].winner == 1 ? "*" : "" %>
+										</span>
+										<%= currentRoundWinner != undefined ? 'asdf' : '' %>
+									</div>
 								<% } %>
 							<% } else { %>
 								<p>Waiting for all players to submit answers</p>
 							<% } %>
 
-						<% } else if (active == 0) { %>
-							<h3 class="text-center">Waiting for other players to join</h3>
-							<% if (gamePlayers.length >= 3){ %>
-								<button type="button" class="btn btn-primary js-startgame">Start Game</button>
-							<% } %>
-						<% } else if (active == 2) { %>
-							<h3 class="text-center">Game Over</h3>
-						<% } else { %>
-							<h3 class="text-center">Loading...</h3>
+						</div>
+
+					<% } else if (active == 0) { %>
+						<h3 class="text-center">Waiting for other players to join</h3>
+						<% if (gamePlayers.length >= 3){ %>
+							<button type="button" class="btn btn-primary js-startgame">Start Game</button>
 						<% } %>
-					</div>
+					<% } else if (active == 2) { %>
+						<h3 class="text-center">Game Over</h3>
+					<% } else { %>
+						<h3 class="text-center">Loading...</h3>
+					<% } %>
 				</div>
 			</div>
+
+			<hr>
 
 			<div class="row">
 				<% if (active == 1){ %>

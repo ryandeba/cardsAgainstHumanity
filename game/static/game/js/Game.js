@@ -91,8 +91,8 @@ $(function(){
 		},
 
 		loadSuccess: function(response){
-			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards);
-			response.gameRounds = this.get("gameRounds").concat(response.gameRounds);
+			response.thisPlayersAnswerCards = this.get("thisPlayersAnswerCards").concat(response.thisPlayersAnswerCards || []);
+			response.gameRounds = this.get("gameRounds").concat(response.gameRounds || []);
 			this.set(response);
 		},
 
