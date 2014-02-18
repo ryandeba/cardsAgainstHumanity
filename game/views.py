@@ -114,7 +114,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 						"text": answer.gameCard.card.text,
 						"gameplayer_id": answer.gamePlayer.id,
 						"card_id": answer.gameCard.card.id,
-						"winner": answer.winner,
+						"winner": answer.isWinner(),
 					} for answer in gameRound.gameroundanswer_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)
 				],
 			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()

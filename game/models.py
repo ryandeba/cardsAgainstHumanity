@@ -228,3 +228,6 @@ class GameRoundAnswer(models.Model):
 	gamePlayer = models.ForeignKey(GamePlayer) #this might seem weird in conjunction with gameCard, but gameCard gets unassigned from the gamePlayer when added
 	winner = models.IntegerField(default = 0)
 	datetimeLastModified = models.DateTimeField(auto_now = True)
+
+	def isWinner(self):
+		return self.winner == 1
