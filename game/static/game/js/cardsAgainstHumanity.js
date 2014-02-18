@@ -54,10 +54,8 @@ $(function(){
 	var showGame = function(id){
 		if (game.get("id") != id){
 			game.set("id", id);
-			var gameView = new cardsAgainstHumanity.GameView({
-				model: game
-			});
-			cardsAgainstHumanity.main.show(gameView);
+			gameLayout = new cardsAgainstHumanity.GameLayout({ model: game });
+			cardsAgainstHumanity.main.show(gameLayout);
 		}
 	};
 

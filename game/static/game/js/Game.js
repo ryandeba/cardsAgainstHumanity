@@ -20,8 +20,8 @@ $(function(){
 			self.listenTo(cardsAgainstHumanity.vent, "showGame:previousRounds", self.setModePreviousRounds);
 			self.listenTo(self, "addBot", self.addBot);
 			self.listenTo(self, "start", self.start);
-			self.listenTo(self, "submitAnswer", self.submitAnswer);
-			self.listenTo(self, "chooseWinner", self.chooseWinner);
+			self.listenTo(cardsAgainstHumanity.vent, "game:submitAnswer", self.submitAnswer);
+			self.listenTo(cardsAgainstHumanity.vent, "game:chooseWinner", self.chooseWinner);
 			self.listenTo(self, "change:id", self.load);
 			self.listenTo(self.get("thisPlayersAnswerCards"), "remove", function(){ self.trigger("change"); });
 
@@ -43,6 +43,10 @@ $(function(){
 				currentRoundWinner: this.getCurrentRoundWinner(),
 				thisPlayersAnswerCards: this.getThisPlayersAnswerCards()
 			});
+		},
+
+		getCurrentRound: function(){
+			return this.get("gameRounds").last();
 		},
 
 		getCurrentRoundQuestioner: function(){
@@ -96,7 +100,18 @@ $(function(){
 			delete response.thisPlayersAnswerCards;
 			delete response.gameRounds;
 			delete response.gamePlayers;
+			this.updateGamePlayerNamesIntoGameRounds();
 			this.set(response);
+		},
+
+		updateGamePlayerNamesIntoGameRounds: function(){
+			var self = this;
+			self.get("gameRounds").each(function(gameRound){
+				gameRound.set(
+					"gamePlayerQuestionerName",
+					self.get("gamePlayers").findWhere({id: gameRound.get("gamePlayerQuestioner_id")}).get("name")
+				);
+			});
 		},
 
 		addBot: function(){
@@ -115,53 +130,85 @@ $(function(){
 			});
 		},
 
-		submitAnswer: function(data){
+		submitAnswer: function(card){
 			var self = this;
 			$.ajax({
-				url: "/game/" + self.get("id") + "/submitAnswer/" + data.id,
-				success: function(response){ self.load(); }
+				url: "/game/" + self.get("id") + "/submitAnswer/" + card.get("card_id"),
+				success: function(response){ 
+					self.get("thisPlayersAnswerCards").remove(card);
+					self.load();
+				}
 			});
 		},
 
-		chooseWinner: function(data){
+		chooseWinner: function(card){
 			var self = this;
 			$.ajax({
-				url: "/game/" + self.get("id") + "/chooseWinner/" + data.id,
+				url: "/game/" + self.get("id") + "/chooseWinner/" + card.get("card_id"),
 				success: function(response){ self.load(); }
 			});
 		}
 	});
 
-	cardsAgainstHumanity.GameView = Backbone.Marionette.ItemView.extend({
+	cardsAgainstHumanity.GameLayout = Backbone.Marionette.Layout.extend({
 		template: "#template-game",
+
+		regions: {
+			navRegion: "#game-nav",
+			mainRegion: "#game-main",
+			answerCardsRegion: "#game-answercards"
+		},
+
+		initialize: function(){
+			this.listenTo(this.model, "change", this.onModelChange);
+		},
+
+		onRender: function(){
+			this.navRegion.show(new cardsAgainstHumanity.GameNavView({ model: this.model }));
+			this.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: this.model.get("thisPlayersAnswerCards") }));
+		},
+
+		onModelChange: function(){
+			var self = this;
+			var mainRegionView;
+			if (self.model.get("active") == 0 && self.model.get("mode") == "currentRound"){
+				mainRegionView = new cardsAgainstHumanity.PregameView({ model: self.model });
+			}
+			else if (self.model.get("mode") == "currentRound"){
+				mainRegionView = new cardsAgainstHumanity.CurrentRoundView({ model: self.model.getCurrentRound() });
+			}
+			else if (self.model.get("mode") == "players"){
+				mainRegionView = new cardsAgainstHumanity.GamePlayersView({ collection: self.model.get("gamePlayers") });
+			}
+			if (mainRegionView != undefined){
+				self.mainRegion.show(mainRegionView);
+			}
+		}
+	});
+
+	cardsAgainstHumanity.GameNavView = Backbone.Marionette.ItemView.extend({
+		template: "#template-gamenav",
+
+		initialize: function(){
+			this.listenTo(this.model, "change", this.render);
+		}
+	});
+
+	cardsAgainstHumanity.PregameView = Backbone.Marionette.ItemView.extend({
+		template: "#template-pregame",
+
+		events: {
+			"click .js-addbot": "addBot",
+			"click .js-startgame": "startGame"
+		},
 
 		initialize: function(){
 			this.listenTo(this.model, "change", this.render);
 		},
 
-		onClose: function(){
-			this.model.set("id", undefined);
-		},
-
-		events: {
-			"click .js-addbot": "addBot",
-			"click .js-startgame": "startGame",
-			"click .js-answercard": "submitAnswer",
-			"click .js-round-answer": "chooseWinner"
-		},
-
 		addBot: function(){ this.model.trigger("addBot"); },
 
-		startGame: function(){ this.model.trigger("start"); },
-
-		submitAnswer: function(e){
-			//I really hate that I'm doing this
-			this.model.trigger("submitAnswer", {id: $(e.currentTarget).attr("data-id") });
-		},
-
-		chooseWinner: function(e){
-			this.model.trigger("chooseWinner", {id: $(e.currentTarget).attr("data-id") });
-		}
+		startGame: function(){ this.model.trigger("start"); }
 	});
 
 });
