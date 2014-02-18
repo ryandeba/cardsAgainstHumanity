@@ -5,8 +5,8 @@ from game.models import Card, Player, Game, GamePlayer, GameCard, GameRound
 
 def createCards():
 	for i in range(30):
-		Card.objects.create(cardType = "A", numberOfAnswers = 0)
-		Card.objects.create(cardType = "Q", numberOfAnswers = 1)
+		Card.objects.create(cardType = "A", numberOfAnswers = 0, expansion = "Base")
+		Card.objects.create(cardType = "Q", numberOfAnswers = 1, expansion = "Base")
 
 class GameMethodTests(TestCase):
 
