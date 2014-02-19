@@ -18,12 +18,13 @@ $(function(){
 			self.listenTo(cardsAgainstHumanity.vent, "showGame:players", self.setModePlayers);
 			self.listenTo(cardsAgainstHumanity.vent, "showGame:chat", self.setModeChat);
 			self.listenTo(cardsAgainstHumanity.vent, "showGame:previousRounds", self.setModePreviousRounds);
-			self.listenTo(self, "addBot", self.addBot);
-			self.listenTo(self, "start", self.start);
 			self.listenTo(cardsAgainstHumanity.vent, "game:submitAnswer", self.submitAnswer);
 			self.listenTo(cardsAgainstHumanity.vent, "game:chooseWinner", self.chooseWinner);
+			self.listenTo(cardsAgainstHumanity.vent, "game:updateSubmittedBy", self.updateSubmittedBy);
+			self.listenTo(self.get("gameRounds"), "add", function(){ self.trigger("add:gameRound"); });
+			self.listenTo(self, "addBot", self.addBot);
+			self.listenTo(self, "start", self.start);
 			self.listenTo(self, "change:id", self.load);
-			self.listenTo(self.get("thisPlayersAnswerCards"), "remove", function(){ self.trigger("change"); });
 
 			setInterval(function(){
 				self.load();
@@ -35,51 +36,18 @@ $(function(){
 		setModeChat: function(){ this.set("mode", "chat"); },
 		setModePreviousRounds: function(){ this.set("mode", "previousRounds"); },
 
-		toJSON: function(){
-			return _.extend(this.attributes, {
-				currentRoundQuestioner: this.getCurrentRoundQuestioner(),
-				currentRoundQuestion: this.getCurrentRoundQuestion(),
-				currentRoundAnswers: this.getCurrentRoundAnswers(),
-				currentRoundWinner: this.getCurrentRoundWinner(),
-				thisPlayersAnswerCards: this.getThisPlayersAnswerCards()
+		updateSubmittedBy: function(answerCards){
+			var self = this;
+			answerCards.each(function(answerCard){
+				answerCard.set(
+					"submittedBy",
+					self.get("gamePlayers").findWhere({id: answerCard.get("gameplayer_id")}).get("name")
+				);
 			});
 		},
 
 		getCurrentRound: function(){
 			return this.get("gameRounds").last();
-		},
-
-		getCurrentRoundQuestioner: function(){
-			if (this.get("gameRounds").length == 0)
-				return "";
-			var currentRoundQuestioner_id = this.get("gameRounds").last().get("gamePlayerQuestioner_id");
-			return this.get("gamePlayers").findWhere({id: currentRoundQuestioner_id});
-		},
-
-		getCurrentRoundQuestion: function(){
-			if (this.get("gameRounds").length == 0)
-				return "";
-			return this.get("gameRounds").last().get("question");
-		},
-
-		getCurrentRoundAnswers: function(){
-			if (this.get("gameRounds").length == 0)
-				return [];
-			return this.get("gameRounds").last().get("answerCards");
-		},
-
-		getCurrentRoundWinner: function(){
-			if (this.get("gameRounds").length == 0)
-				return undefined;
-			var lastRound = this.get("gameRounds").last();
-			var winningAnswer = lastRound.get("answerCards").findWhere({winner: 1});
-			if (winningAnswer == undefined)
-				return undefined
-			return this.get("gamePlayers").findWhere({id: winningAnswer.gameplayer_id});
-		},
-
-		getThisPlayersAnswerCards: function(){
-			return this.get("thisPlayersAnswerCards");
 		},
 
 		load: function(){
@@ -101,6 +69,7 @@ $(function(){
 			delete response.gameRounds;
 			delete response.gamePlayers;
 			this.updateGamePlayerNamesIntoGameRounds();
+			this.updateGamePlayerScores();
 			this.set(response);
 		},
 
@@ -111,6 +80,17 @@ $(function(){
 					"gamePlayerQuestionerName",
 					self.get("gamePlayers").findWhere({id: gameRound.get("gamePlayerQuestioner_id")}).get("name")
 				);
+			});
+		},
+
+		updateGamePlayerScores: function(){
+			var self = this;
+			self.get("gamePlayers").each(function(gamePlayer){
+				var score = 0;
+				self.get("gameRounds").each(function(gameRound){
+					score += gameRound.getWinnerGamePlayerID() == gamePlayer.get("id") ? 1 : 0;
+				});
+				gamePlayer.set("score", score);
 			});
 		},
 
@@ -160,7 +140,9 @@ $(function(){
 		},
 
 		initialize: function(){
-			this.listenTo(this.model, "change", this.onModelChange);
+			this.listenTo(this.model, "change:active", this.onModelChange);
+			this.listenTo(this.model, "change:mode", this.onModelChange);
+			this.listenTo(this.model, "add:gameRound", this.onModelChange);
 		},
 
 		onRender: function(){

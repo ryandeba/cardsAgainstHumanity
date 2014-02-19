@@ -1,6 +1,9 @@
 $(function(){
 
 	cardsAgainstHumanity.GamePlayer = Backbone.Model.extend({
+		defaults: {
+			score: 0
+		}
 	});
 
 	cardsAgainstHumanity.GamePlayerView = Backbone.Marionette.ItemView.extend({

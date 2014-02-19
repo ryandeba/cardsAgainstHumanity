@@ -2,7 +2,9 @@ $(function(){
 
 	cardsAgainstHumanity.GameRound = Backbone.Model.extend({
 		defaults: {
-			answers: []
+			answers: [],
+			allAnswersHaveBeenSubmitted: false,
+			gamePlayerQuestionerName: ""
 		},
 
 		initialize: function(){
@@ -10,10 +12,27 @@ $(function(){
 			self.set("answerCards", new cardsAgainstHumanity.AnswerCards());
 			self.updateAnswerCards();
 			self.listenTo(self, "change:answers", self.updateAnswerCards);
+			self.listenTo(self, "change:isComplete", self.updateAnswerCardsWithSubmitterName);
 		},
 
 		updateAnswerCards: function(){
-			this.get("answerCards").set(this.get("answers"), {remove: false});
+			var self = this;
+			self.get("answerCards").set(self.get("answers"), {remove: false});
+			self.get("answerCards").each(function(answerCard){
+				answerCard.set("faceUp", self.get("allAnswersHaveBeenSubmitted"));
+			});
+		},
+
+		updateAnswerCardsWithSubmitterName: function(){
+			if (this.get("isComplete")){
+				cardsAgainstHumanity.vent.trigger("game:updateSubmittedBy", this.get("answerCards"));
+			}
+		},
+
+		getWinnerGamePlayerID: function(){
+			var self = this;
+			var winningAnswerCard = self.get("answerCards").findWhere({winner: true});
+			return winningAnswerCard == undefined ? undefined : winningAnswerCard.get("gameplayer_id");
 		}
 	});
 
@@ -22,6 +41,10 @@ $(function(){
 
 		regions: {
 			answerCardsRegion: "#currentround-answercards"
+		},
+
+		initialize: function(){
+			this.listenTo(this.model, "change:gamePlayerQuestionerName", this.render);
 		},
 
 		onRender: function(){
@@ -37,7 +60,7 @@ $(function(){
 	});
 
 	cardsAgainstHumanity.GameRoundAnwerCardView = Backbone.Marionette.ItemView.extend({
-		template: "#template-answercard",
+		template: "#template-gameroundanswercard",
 
 		events: {
 			"click": "onClick"
@@ -45,6 +68,10 @@ $(function(){
 
 		attributes: {
 			"class": "col-md-3 col-sm-4 col-xs-6"
+		},
+
+		initialize: function(){
+			this.listenTo(this.model, "change", this.render);
 		},
 
 		onClick: function(){

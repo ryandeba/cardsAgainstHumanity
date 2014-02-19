@@ -4,7 +4,9 @@ $(function(){
 		idAttribute: "card_id",
 
 		defaults: {
-			winner: false
+			winner: false,
+			faceUp: true,
+			submittedBy: ""
 		}
 	});
 
@@ -17,6 +19,10 @@ $(function(){
 
 		attributes: {
 			'class': 'col-md-2 col-sm-3 col-xs-6'
+		},
+
+		initialize: function(){
+			this.listenTo(this.model, "change", this.render);
 		},
 
 		events: {

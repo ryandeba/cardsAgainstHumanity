@@ -109,6 +109,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 				"gamePlayerQuestioner_id": gameRound.gamePlayerQuestioner_id,
 				"question": gameRound.gameCardQuestion.card.text,
 				"isComplete": gameRound.isComplete(),
+				"allAnswersHaveBeenSubmitted": gameRound.allAnswersHaveBeenSubmitted(),
 				"answers": [
 					{
 						"text": answer.gameCard.card.text,
