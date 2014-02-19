@@ -63,11 +63,11 @@ $(function(){
 
 		loadSuccess: function(response){
 			this.get("thisPlayersAnswerCards").set(response.thisPlayersAnswerCards || [], {remove: false});
-			this.get("gameRounds").set(response.gameRounds || [], {remove: false});
 			this.get("gamePlayers").set(response.gamePlayers || [], {remove: false});
+			this.get("gameRounds").set(response.gameRounds || [], {remove: false});
 			delete response.thisPlayersAnswerCards;
-			delete response.gameRounds;
 			delete response.gamePlayers;
+			delete response.gameRounds;
 			this.updateGamePlayerNamesIntoGameRounds();
 			this.updateGamePlayerScores();
 			this.set(response);
@@ -161,6 +161,9 @@ $(function(){
 			}
 			else if (self.model.get("mode") == "players"){
 				mainRegionView = new cardsAgainstHumanity.GamePlayersView({ collection: self.model.get("gamePlayers") });
+			}
+			else if (self.model.get("mode") == "previousRounds"){
+				mainRegionView = new cardsAgainstHumanity.GameRoundsView({ collection: self.model.get("gameRounds") });
 			}
 			if (mainRegionView != undefined){
 				self.mainRegion.show(mainRegionView);

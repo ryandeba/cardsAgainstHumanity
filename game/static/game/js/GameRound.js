@@ -21,6 +21,7 @@ $(function(){
 			self.get("answerCards").each(function(answerCard){
 				answerCard.set("faceUp", self.get("allAnswersHaveBeenSubmitted"));
 			});
+			self.updateAnswerCardsWithSubmitterName();
 		},
 
 		updateAnswerCardsWithSubmitterName: function(){
@@ -81,6 +82,14 @@ $(function(){
 
 	cardsAgainstHumanity.GameRoundAnswerCardsView = Backbone.Marionette.CollectionView.extend({
 		itemView: cardsAgainstHumanity.GameRoundAnwerCardView
+	});
+
+	cardsAgainstHumanity.GameRoundView = Backbone.Marionette.ItemView.extend({
+		template: "#template-gameround"
+	});
+
+	cardsAgainstHumanity.GameRoundsView = Backbone.Marionette.CollectionView.extend({
+		itemView: cardsAgainstHumanity.GameRoundView
 	});
 
 });

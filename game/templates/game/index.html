@@ -128,7 +128,7 @@
 				<h4><%= gamePlayerQuestionerName %> wants to know...</h4>
 				<div class="row">
 					<div class="col-md-3 col-sm-4 col-xs-6">
-						<div class="card question animated flipInY"><div><%= question.replace("_", "________") %></div></div>
+						<div class="card question animated"><div><%= question.replace("_", "________") %></div></div>
 					</div>
 					<div id="currentround-answercards"></div>
 				</div>
@@ -142,7 +142,7 @@
 		</script>
 
 		<script type="text/template" id="template-gameroundanswercard">
-			<div class="card answer animated flipInY">
+			<div class="card answer animated">
 				<div>
 					<% if (faceUp) { %>
 						<%= text %>
@@ -153,6 +153,22 @@
 						<%= winner ? '<h4>Winner!</h4>' : '' %>
 					<% } %>
 				</div>
+			</div>
+		</script>
+
+		<script type="text/template" id="template-gameround">
+			<div class="well">
+				<%= gamePlayerQuestionerName %> asks: <%= question %>
+				<ul>
+					<% for (var i = 0; i < answerCards.length; i++){ %>
+						<li>
+							<%= answerCards.at(i).get("submittedBy") %>: <%= answerCards.at(i).get("text") %>
+							<% if (answerCards.at(i).get("winner")) { %>
+								- Winner
+							<% } %>
+						</li>
+					<% } %>
+				</ul>
 			</div>
 		</script>
 
