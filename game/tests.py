@@ -7,8 +7,25 @@ def createCards():
 	for i in range(30):
 		Card.objects.create(cardType = "A", numberOfAnswers = 0, expansion = "Base")
 		Card.objects.create(cardType = "Q", numberOfAnswers = 1, expansion = "Base")
+		Card.objects.create(cardType = "A", numberOfAnswers = 0, expansion = "CAHe1")
+		Card.objects.create(cardType = "Q", numberOfAnswers = 1, expansion = "CAHe1")
+		Card.objects.create(cardType = "A", numberOfAnswers = 0, expansion = "CAHe2")
+		Card.objects.create(cardType = "Q", numberOfAnswers = 1, expansion = "CAHe2")
 
 class GameMethodTests(TestCase):
+
+	def test_addCards_BaseIsAlwaysIncluded(self):
+		createCards();
+		game = Game(id = 1, expansionList = "")
+		game.addCards()
+		self.assertTrue(game.gamecard_set.filter(card__expansion = 'Base').count() > 0)
+
+	def test_addCards_CorrectExpansionsAreIncluded(self):
+		createCards();
+		game = Game(id = 1, expansionList = "CAHe1")
+		game.addCards()
+		self.assertTrue(game.gamecard_set.filter(card__expansion = 'CAHe1').count() > 0)
+		self.assertTrue(game.gamecard_set.filter(card__expansion = 'CAHe2').count() == 0)
 
 	def test_addPlayer_newPlayerIsAdded(self):
 		game = Game.objects.create(active = 0)

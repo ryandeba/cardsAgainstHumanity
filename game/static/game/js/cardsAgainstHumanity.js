@@ -24,6 +24,7 @@ $(function(){
 	var createGame = function(data){
 		$.ajax({
 			url: "/newGame",
+			data: data,
 			success: function(response){ cardsAgainstHumanity.vent.trigger("navigate", "game/" + response.id); }
 		});
 	};

@@ -9,7 +9,12 @@ $(function(){
 
 		createGame: function(e){
 			e.preventDefault();
-			cardsAgainstHumanity.vent.trigger("createGame", {});
+			var expansionList = "";
+			this.$el.find("input:checkbox").each(function(){
+				expansionList += $(this).val() + ",";
+			});
+			this.$el.find("#expansionlist").val(expansionList);
+			cardsAgainstHumanity.vent.trigger("createGame", $(e.currentTarget).serialize());
 		}
 	});
 

@@ -23,21 +23,27 @@ class Player(models.Model):
 		return self.name
 
 class GameManager(models.Manager):
-	def create(self, active = 0):
-		game = super(GameManager, self).create(active = active)
+	def create(self, active = 0, expansionList = ""):
+		game = super(GameManager, self).create(active = active, expansionList = expansionList)
 		game.addCards()
 		return game
 
 class Game(models.Model):
 	active = models.IntegerField(default = 0) #0 - lobby, 1 - active, 2 - finished #TODO: rename this column to status or something
 	datetimeLastModified = models.DateTimeField(auto_now = True)
+	expansionList = models.CharField(max_length = 200)
 	objects = GameManager()
 
 	def __unicode__(self):
 		return "ID: %s | Active: %s | Players: %s" % (self.id, self.active, self.getNumberOfPlayers())
 
 	def addCards(self):
-		self.gamecard_set.bulk_create([GameCard(game = self, card = card) for card in Card.objects.filter(expansion = 'Base', numberOfAnswers__lt = 2)])
+		self.gamecard_set.bulk_create(
+			[
+				GameCard(game = self, card = card)
+				for card in Card.objects.filter(expansion__in = ("Base," + self.expansionList).split(","), numberOfAnswers__lt = 2)
+			]
+		)
 		return
 
 	def getNumberOfPlayers(self):

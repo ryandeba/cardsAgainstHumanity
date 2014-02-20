@@ -4,7 +4,7 @@ from django.utils.dateformat import format
 from django.utils.timezone import utc
 from django.db.models import Q
 
-from game.models import Player, Game
+from game.models import Player, Game, Card
 
 import random, json, time, datetime
 
@@ -42,7 +42,7 @@ def lobby(request):
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
 
 def newGame(request):
-	game = Game.objects.create()
+	game = Game.objects.create(expansionList = request.GET.get("expansionlist", ""))
 
 	responseData = { "id": game.id, }
 	return HttpResponse(json.dumps(responseData), content_type="application/json")
