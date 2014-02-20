@@ -145,6 +145,10 @@ $(function(){
 			this.listenTo(this.model, "add:gameRound", this.onModelChange);
 		},
 
+		onClose: function(){
+			this.model.set("id", undefined);
+		},
+
 		onRender: function(){
 			this.navRegion.show(new cardsAgainstHumanity.GameNavView({ model: this.model }));
 			this.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: this.model.get("thisPlayersAnswerCards") }));
