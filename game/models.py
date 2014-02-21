@@ -14,6 +14,12 @@ class Card(models.Model):
 	def __unicode__(self):
 		return self.cardType + " | " + self.text
 
+class Name(models.Model):
+	name = models.CharField(max_length = 50)
+
+	def __unicode__(self):
+		return self.name
+
 class Player(models.Model):
 	hash = models.CharField(max_length = 32)
 	name = models.CharField(max_length = 50)
@@ -179,6 +185,7 @@ class Game(models.Model):
 class GamePlayer(models.Model):
 	game = models.ForeignKey(Game)
 	player = models.ForeignKey(Player, null = True)
+	name = models.CharField(max_length = 50)
 	datetimeCreated = models.DateTimeField(auto_now_add = True)
 	datetimeLastModified = models.DateTimeField(auto_now = True)
 
@@ -190,7 +197,10 @@ class GamePlayer(models.Model):
 	def getName(self):
 		if self.player and len(self.player.name) > 0:
 			return self.player.name
-		return "Anonymous"
+		if len(self.name) == 0:
+			self.name = Name.objects.all().order_by("?").first().name
+			self.save()
+		return self.name
 
 	def getPoints(self):
 		return self.gameroundanswer_set.all().filter(winner = 1).count()

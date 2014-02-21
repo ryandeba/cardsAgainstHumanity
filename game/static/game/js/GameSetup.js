@@ -10,7 +10,7 @@ $(function(){
 		createGame: function(e){
 			e.preventDefault();
 			var expansionList = "";
-			this.$el.find("input:checkbox").each(function(){
+			this.$el.find("input:checkbox:checked").each(function(){
 				expansionList += $(this).val() + ",";
 			});
 			this.$el.find("#expansionlist").val(expansionList);
