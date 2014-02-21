@@ -1,6 +1,6 @@
 $(function(){
 
-	//var game;
+	var game;
 
 	cardsAgainstHumanity = new Backbone.Marionette.Application();
 
@@ -18,6 +18,7 @@ $(function(){
 		this.listenTo(this.vent, "showGame", showGame);
 		this.listenTo(this.vent, "showAbout", showAbout);
 		this.listenTo(this.vent, "showLobby", showLobby);
+		this.listenTo(this.vent, "submitMessage", submitMessage);
 		Backbone.history.start();
 	});
 
@@ -69,6 +70,16 @@ $(function(){
 			model: user,
 			el: "#form-username"
 		}).render();
+	};
+
+	var submitMessage = function(data){
+		$.ajax({
+			url: "/game/" + game.get("id") + "/submitMessage",
+			data: data,
+			success: function(response){
+				game.load(); //TODO: fix this
+			}
+		});
 	};
 
 });

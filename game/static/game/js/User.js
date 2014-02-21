@@ -21,10 +21,10 @@ $(function(){
 
 		render: function(){
 			var $submit = this.$el.find(".js-username-submit");
-			if (this.model.get("localUsername") == this.model.get("serverUsername")){
-				$submit.removeClass("btn-primary").addClass("btn-success").html("Saved");
+			if (this.model.get("localUsername").length > 0 && this.model.get("localUsername") == this.model.get("serverUsername")){
+				$submit.removeClass("btn-warning").addClass("btn-success").html("Saved");
 			} else {
-				$submit.addClass("btn-primary").removeClass("btn-success").html("Save");
+				$submit.addClass("btn-warning").removeClass("btn-success").html("Save");
 			}
 		},
 

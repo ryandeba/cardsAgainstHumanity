@@ -237,3 +237,9 @@ class GameRoundAnswer(models.Model):
 
 	def isWinner(self):
 		return self.winner == 1
+
+class GameMessage(models.Model):
+	game = models.ForeignKey(Game)
+	gamePlayer = models.ForeignKey(GamePlayer)
+	message = models.CharField(max_length = 500)
+	datetimeLastModified = models.DateTimeField(auto_now = True)

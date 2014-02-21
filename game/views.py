@@ -86,6 +86,16 @@ def chooseWinner(request, game_id, card_id):
 	game.gamePlayerPicksWinningAnswerCard(gamePlayer, gameCard)
 	return HttpResponse(status = 200)
 
+def submitMessage(request, game_id):
+	message = request.GET.get("message", "")
+	if len(message.strip()) == 0:
+		return HttpResponse(status = 400)
+	game = Game.objects.get(id = game_id)
+	player = Player.objects.get(hash = request.COOKIES["playerhash"])
+	gamePlayer = game.gameplayer_set.get(game = game, player = player)
+	game.gamemessage_set.create(game = game, gamePlayer = gamePlayer, message = message)
+	return HttpResponse(status = 200)
+
 def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 	thisPlayersAnswerCards = [
 			{
@@ -121,11 +131,19 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 			} for gameRound in game.gameround_set.all().filter(Q(datetimeLastModified__gte = datetimeLastUpdated) | Q(gameroundanswer__datetimeLastModified__gte = datetimeLastUpdated)).order_by("id").distinct()
 		]
 
+	gameMessages = [
+		{
+			"gameplayer_id": gameMessage.gamePlayer_id,
+			"message": gameMessage.message,
+		} for gameMessage in game.gamemessage_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)
+	]
+
 	if (
 		datetimeToEpoch(game.datetimeLastModified) < datetimeToEpoch(datetimeLastUpdated)
 		and len(thisPlayersAnswerCards) == 0
 		and len(gamePlayers) == 0
 		and len(gameRounds) == 0
+		and len(gameMessages) == 0
 	):
 		return {}
 	result = {
@@ -135,6 +153,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 		"thisPlayersAnswerCards": thisPlayersAnswerCards,
 		"gamePlayers": gamePlayers,
 		"gameRounds": gameRounds,
+		"gameMessages": gameMessages,
 	}
 	return result
 

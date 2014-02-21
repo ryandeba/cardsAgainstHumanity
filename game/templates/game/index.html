@@ -58,6 +58,7 @@
 		<script src="{% static 'game/js/GamePlayer.js' %}"></script>
 		<script src="{% static 'game/js/AnswerCard.js' %}"></script>
 		<script src="{% static 'game/js/GameRound.js' %}"></script>
+		<script src="{% static 'game/js/GameMessage.js' %}"></script>
 		<script src="{% static 'game/js/GameSetup.js' %}"></script>
 		<script src="{% static 'game/js/Game.js' %}"></script>
 		<script src="{% static 'game/js/Router.js' %}"></script>
@@ -114,6 +115,9 @@
 				<li id="nav-currentround" class="<%= mode == 'currentRound' ? 'active' : '' %>">
 					<a href="#game/<%= id %>/currentRound">Current Round</a>
 				</li>
+				<li id="nav-players" class="<%= mode == 'chat' ? 'active' : '' %>">
+					<a href="#game/<%= id %>/chat">Chat</a>
+				</li>
 				<li id="nav-players" class="<%= mode == 'players' ? 'active' : '' %>">
 					<a href="#game/<%= id %>/players">Players / Score</a>
 				</li>
@@ -121,6 +125,29 @@
 					<a href="#game/<%= id %>/previousRounds">Previous Rounds</a>
 				</li>
 			</ul>
+		</script>
+
+		<script type="text/template" id="template-gamemessage">
+			<strong><%= name %></strong>: <%= message %>
+		</script>
+
+		<script type="text/template" id="template-chat">
+			<div class="row">
+				<div id="chat-messages" class="col-xs-12">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<form id="form-message">
+						<div class="input-group">
+							<input type="text" id="chat-message" name="message" maxlength="200" class="form-control" />
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-default">Send message</button>
+							</span>
+						</div>
+					</form>
+				</div>
+			</div>
 		</script>
 
 		<script type="text/template" id="template-currentround">

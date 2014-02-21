@@ -6,6 +6,7 @@ $(function(){
 			active: undefined,
 			gamePlayers: new cardsAgainstHumanity.GamePlayers(),
 			gameRounds: new cardsAgainstHumanity.GameRounds(),
+			gameMessages: new cardsAgainstHumanity.GameMessages(),
 			thisPlayersAnswerCards: new cardsAgainstHumanity.AnswerCards(),
 			lastUpdated: 0
 		},
@@ -65,11 +66,14 @@ $(function(){
 			this.get("thisPlayersAnswerCards").set(response.thisPlayersAnswerCards || [], {remove: false});
 			this.get("gamePlayers").set(response.gamePlayers || [], {remove: false});
 			this.get("gameRounds").set(response.gameRounds || [], {remove: false});
+			this.get("gameMessages").set(response.gameMessages || [], {remove: false});
 			delete response.thisPlayersAnswerCards;
 			delete response.gamePlayers;
 			delete response.gameRounds;
+			delete response.gameMessages;
 			this.updateGamePlayerNamesIntoGameRounds();
 			this.updateGamePlayerScores();
+			this.updateGamePlayerNamesIntoGameMessages();
 			this.set(response);
 		},
 
@@ -79,6 +83,16 @@ $(function(){
 				gameRound.set(
 					"gamePlayerQuestionerName",
 					self.get("gamePlayers").findWhere({id: gameRound.get("gamePlayerQuestioner_id")}).get("name")
+				);
+			});
+		},
+
+		updateGamePlayerNamesIntoGameMessages: function(){
+			var self = this;
+			self.get("gameMessages").each(function(gameMessage){
+				gameMessage.set(
+					"name",
+					self.get("gamePlayers").findWhere({id: gameMessage.get("gameplayer_id")}).get("name")
 				);
 			});
 		},
@@ -162,6 +176,9 @@ $(function(){
 			}
 			else if (self.model.get("mode") == "currentRound"){
 				mainRegionView = new cardsAgainstHumanity.CurrentRoundView({ model: self.model.getCurrentRound() });
+			}
+			else if (self.model.get("mode") == "chat"){
+				mainRegionView = new cardsAgainstHumanity.ChatLayout({ collection: self.model.get("gameMessages") });
 			}
 			else if (self.model.get("mode") == "players"){
 				mainRegionView = new cardsAgainstHumanity.GamePlayersView({ collection: self.model.get("gamePlayers") });
