@@ -111,20 +111,20 @@
 		</script>
 
 		<script type="text/template" id="template-gamenav">
-			<ul class="nav nav-pills nav-justified">
-				<li id="nav-currentround" class="<%= mode == 'currentRound' ? 'active' : '' %>">
-					<a href="#game/<%= id %>/currentRound">Current Round</a>
-				</li>
-				<li id="nav-players" class="<%= mode == 'chat' ? 'active' : '' %>">
-					<a href="#game/<%= id %>/chat">Chat</a>
-				</li>
-				<li id="nav-players" class="<%= mode == 'players' ? 'active' : '' %>">
-					<a href="#game/<%= id %>/players">Players / Score</a>
-				</li>
-				<li id="nav-previousrounds" class="<%= mode == 'previousRounds' ? 'active' : '' %>">
-					<a href="#game/<%= id %>/previousRounds">Previous Rounds</a>
-				</li>
-			</ul>
+			<div class="btn-group btn-group-justified" style="position: fixed; left: 0; bottom: 0; z-index: 9999;">
+				<a class="btn btn-primary <%= mode == 'currentRound' ? 'active' : '' %>" href="#game/<%= id %>/currentRound">
+					<span class="glyphicon glyphicon-tower"></span>
+				</a>
+				<a class="btn btn-primary <%= mode == 'chat' ? 'active' : '' %>" href="#game/<%= id %>/chat">
+					<span class="glyphicon glyphicon-comment"></span>
+				</a>
+				<a class="btn btn-primary <%= mode == 'players' ? 'active' : '' %>" href="#game/<%= id %>/players">
+					<span class="glyphicon glyphicon-user"></span>
+				</a>
+				<a class="btn btn-primary <%= mode == 'previousRounds' ? 'active' : '' %>" href="#game/<%= id %>/previousRounds">
+					<span class="glyphicon glyphicon-time"></span>
+				</a>
+			</div>
 		</script>
 
 		<script type="text/template" id="template-gamemessage">
@@ -133,8 +133,7 @@
 
 		<script type="text/template" id="template-chat">
 			<div class="row">
-				<div id="chat-messages" class="col-xs-12">
-				</div>
+				<div id="chat-messages" class="col-xs-12"></div>
 			</div>
 			<div class="row">
 				<div class="col-xs-12">

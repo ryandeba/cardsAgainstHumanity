@@ -165,7 +165,6 @@ $(function(){
 
 		onRender: function(){
 			this.navRegion.show(new cardsAgainstHumanity.GameNavView({ model: this.model }));
-			this.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: this.model.get("thisPlayersAnswerCards") }));
 		},
 
 		onModelChange: function(){
@@ -176,15 +175,19 @@ $(function(){
 			}
 			else if (self.model.get("mode") == "currentRound"){
 				mainRegionView = new cardsAgainstHumanity.CurrentRoundView({ model: self.model.getCurrentRound() });
+				self.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: self.model.get("thisPlayersAnswerCards") }));
 			}
 			else if (self.model.get("mode") == "chat"){
 				mainRegionView = new cardsAgainstHumanity.ChatLayout({ collection: self.model.get("gameMessages") });
+				self.answerCardsRegion.close();
 			}
 			else if (self.model.get("mode") == "players"){
 				mainRegionView = new cardsAgainstHumanity.GamePlayersView({ collection: self.model.get("gamePlayers") });
+				self.answerCardsRegion.close();
 			}
 			else if (self.model.get("mode") == "previousRounds"){
 				mainRegionView = new cardsAgainstHumanity.GameRoundsView({ collection: self.model.get("gameRounds") });
+				self.answerCardsRegion.close();
 			}
 			if (mainRegionView != undefined){
 				self.mainRegion.show(mainRegionView);
