@@ -43,8 +43,7 @@ $(function(){
 
 		events: {
 			"click .js-refreshlobby": "refreshLobby",
-			"click .js-newgame": "newGame",
-			"submit .js-username-form": "setUsername"
+			"click .js-newgame": "newGame"
 		},
 
 		refreshLobby: function(){
@@ -53,13 +52,8 @@ $(function(){
 
 		newGame: function(){
 			cardsAgainstHumanity.vent.trigger("lobby:setupNewGame");
-		},
-
-		setUsername: function(e){
-			e.preventDefault();
-			var username = this.$el.find("#username").val();
-			$.ajax({ url: "setPlayerName/" + username });
 		}
+
 	});
 
 });

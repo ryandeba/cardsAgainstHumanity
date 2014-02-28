@@ -13,22 +13,14 @@ $(function(){
 		initUser($("#username").val());
 		game = new cardsAgainstHumanity.Game();
 
-		this.listenTo(this.vent, "createGame", createGame);
 		this.listenTo(this.vent, "showGameSetup", showGameSetup);
 		this.listenTo(this.vent, "showGame", showGame);
 		this.listenTo(this.vent, "showAbout", showAbout);
 		this.listenTo(this.vent, "showLobby", showLobby);
-		this.listenTo(this.vent, "submitMessage", submitMessage);
+		this.listenTo(this.vent, "createGame", ajaxCreateGame);
+		this.listenTo(this.vent, "submitMessage", ajaxSubmitMessage);
 		Backbone.history.start();
 	});
-
-	var createGame = function(data){
-		$.ajax({
-			url: "/newGame",
-			data: data,
-			success: function(response){ cardsAgainstHumanity.vent.trigger("navigate", "game/" + response.id); }
-		});
-	};
 
 	var storePlayerHash = function(playerhash){
 		$.cookie("playerhash", playerhash, {path: "/"});
@@ -72,7 +64,15 @@ $(function(){
 		}).render();
 	};
 
-	var submitMessage = function(data){
+	var ajaxCreateGame = function(data){
+		$.ajax({
+			url: "/newGame",
+			data: data,
+			success: function(response){ cardsAgainstHumanity.vent.trigger("navigate", "game/" + response.id); }
+		});
+	};
+
+	var ajaxSubmitMessage = function(data){
 		$.ajax({
 			url: "/game/" + game.get("id") + "/submitMessage",
 			data: data,
