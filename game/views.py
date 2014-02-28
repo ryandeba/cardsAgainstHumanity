@@ -133,6 +133,7 @@ def getGameJSON(game, thisPlayer, datetimeLastUpdated):
 
 	gameMessages = [
 		{
+			"id": gameMessage.id,
 			"gameplayer_id": gameMessage.gamePlayer_id,
 			"message": gameMessage.message,
 		} for gameMessage in game.gamemessage_set.all().filter(datetimeLastModified__gte = datetimeLastUpdated)

@@ -161,6 +161,7 @@ $(function(){
 
 		onClose: function(){
 			this.model.set("id", undefined);
+			this.model.set("lastUpdated", 0);
 		},
 
 		onRender: function(){

@@ -20,7 +20,11 @@ $(function(){
 	});
 
 	cardsAgainstHumanity.GameMessagesView = Backbone.Marionette.CollectionView.extend({
-		itemView: cardsAgainstHumanity.GameMessageView
+		itemView: cardsAgainstHumanity.GameMessageView,
+
+		appendHtml: function(collectionView, itemView){
+			collectionView.$el.prepend(itemView.el);
+		}
 	});
 
 	cardsAgainstHumanity.ChatLayout = Backbone.Marionette.Layout.extend({

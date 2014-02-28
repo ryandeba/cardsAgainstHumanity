@@ -88,8 +88,12 @@ $(function(){
 		template: "#template-gameround"
 	});
 
-	cardsAgainstHumanity.GameRoundsView = Backbone.Marionette.CollectionView.extend({
-		itemView: cardsAgainstHumanity.GameRoundView
+	cardsAgainstHumanity.GameRoundsView = Backbone.Marionette.CompositeView.extend({
+		template: "#template-previousrounds",
+
+		itemView: cardsAgainstHumanity.GameRoundView,
+
+		itemViewContainer: "#previousrounds-items"
 	});
 
 });
