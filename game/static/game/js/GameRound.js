@@ -45,7 +45,7 @@ $(function(){
 		},
 
 		initialize: function(){
-			this.listenTo(this.model, "change:gamePlayerQuestionerName", this.render);
+			this.listenTo(this.model, "change", this.render);
 		},
 
 		onRender: function(){

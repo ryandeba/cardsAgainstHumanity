@@ -164,10 +164,14 @@
 		<script type="text/template" id="template-currentround">
 			<div class="col-xs-12">
 				<h3>Current Round</h3>
-				<h4><%= gamePlayerQuestionerName %> wants to know...</h4>
+				<% if (isComplete) { %>
+					<h4>Next round will start soon</h4>
+				<% } else { %>
+					<h4><%= gamePlayerQuestionerName %> wants to know...</h4>
+				<% } %>
 				<div class="row">
 					<div class="col-md-3 col-sm-4 col-xs-6">
-						<div class="card question animated"><div><%= question.replace("_", "________") %></div></div>
+						<div class="card question"><div><%= question.replace("_", "________") %></div></div>
 					</div>
 					<div id="currentround-answercards"></div>
 				</div>
@@ -221,6 +225,12 @@
 					<button type="button" class="btn btn-primary js-startgame">Start Game</button>
 				<% } %>
 				<h4>Players: <%= gamePlayers.length %></h4>
+			</div>
+		</script>
+
+		<script type="text/template" id="template-postgame">
+			<div class="col-xs-12">
+				<h3 class="text-center">Game Over</h3>
 			</div>
 		</script>
 

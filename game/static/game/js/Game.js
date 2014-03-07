@@ -29,7 +29,7 @@ $(function(){
 
 			setInterval(function(){
 				self.load();
-			}, 5000);
+			}, 3000);
 		},
 
 		setModeCurrentRound: function(){ this.set("mode", "currentRound"); },
@@ -174,6 +174,10 @@ $(function(){
 			if (self.model.get("active") == 0 && self.model.get("mode") == "currentRound"){
 				mainRegionView = new cardsAgainstHumanity.PregameView({ model: self.model });
 			}
+			else if (self.model.get("active") == 2 && self.model.get("mode") == "currentRound"){
+				mainRegionView = new cardsAgainstHumanity.PostGameView({ model: self.model });
+				self.answerCardsRegion.close();
+			}
 			else if (self.model.get("mode") == "currentRound"){
 				mainRegionView = new cardsAgainstHumanity.CurrentRoundView({ model: self.model.getCurrentRound() });
 				if (_.isUndefined(self.answerCardsRegion.currentView)){
@@ -221,6 +225,10 @@ $(function(){
 		addBot: function(){ this.model.trigger("addBot"); },
 
 		startGame: function(){ this.model.trigger("start"); }
+	});
+
+	cardsAgainstHumanity.PostGameView = Backbone.Marionette.ItemView.extend({
+		template: "#template-postgame"
 	});
 
 });
