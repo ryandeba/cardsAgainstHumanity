@@ -176,7 +176,9 @@ $(function(){
 			}
 			else if (self.model.get("mode") == "currentRound"){
 				mainRegionView = new cardsAgainstHumanity.CurrentRoundView({ model: self.model.getCurrentRound() });
-				self.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: self.model.get("thisPlayersAnswerCards") }));
+				if (_.isUndefined(self.answerCardsRegion.currentView)){
+					self.answerCardsRegion.show(new cardsAgainstHumanity.AnswerCardsView({ collection: self.model.get("thisPlayersAnswerCards") }));
+				}
 			}
 			else if (self.model.get("mode") == "chat"){
 				mainRegionView = new cardsAgainstHumanity.ChatLayout({ collection: self.model.get("gameMessages") });
